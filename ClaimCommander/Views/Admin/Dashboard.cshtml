@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container">
+    <h2 class="text-success">Admin – Pending Claims</h2>
+
+    <table class="table table-dark table-bordered">
+        <thead>
+            <tr>
+                <th>Lecturer</th>
+                <th>Subject</th>
+                <th>Hours</th>
+                <th>Rate</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>John Doe</td>
+                <td>Info Systems</td>
+                <td>10</td>
+                <td>R300</td>
+                <td>Pending</td>
+                <td>
+                    <button class="btn btn-outline-success">Approve</button>
+                    <button class="btn btn-outline-danger">Reject</button>
+                    <button class="btn btn-outline-info">View Doc</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

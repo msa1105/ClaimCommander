@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Lecturer Dashboard";
+}
+
+<div class="container">
+    <h2 class="text-success">Welcome, Lecturer</h2>
+    <a class="btn btn-success my-2" href="/Lecturer/SubmitClaim">Submit New Claim</a>
+
+    <h4>Your Submitted Claims</h4>
+    <table class="table table-dark table-striped">
+        <thead>
+            <tr>
+                <th>Submission Date</th>
+                <th>Status</th>
+                <th>Total Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Loop sample -->
+            <tr>
+                <td>2025-07-01</td>
+                <td>Pending</td>
+                <td>R3,000</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

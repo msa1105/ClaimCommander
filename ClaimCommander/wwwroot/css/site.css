@@ -1,0 +1,19 @@
+body {
+    background-color: #0A0A0A;
+    color: white;
+}
+
+h2, .text-success {
+    color: #00FF00 !important;
+}
+
+.table {
+    background-color: #121212;
+    color: white;
+}
+
+.btn-success {
+    background-color: #00FF00;
+    border: none;
+    color: black;
+}
