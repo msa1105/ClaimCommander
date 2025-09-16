@@ -1,4 +1,4 @@
-namespace ClaimCommander.Models
+﻿namespace ClaimCommander.Models
 {
     public class ErrorViewModel
     {

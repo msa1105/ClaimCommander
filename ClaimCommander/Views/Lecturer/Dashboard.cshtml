@@ -2,26 +2,96 @@
     ViewData["Title"] = "Lecturer Dashboard";
 }
 
-<div class="container">
-    <h2 class="text-success">Welcome, Lecturer</h2>
-    <a class="btn btn-success my-2" href="/Lecturer/SubmitClaim">Submit New Claim</a>
+<h2 class="display-6 fw-bold">Lecturer Dashboard</h2> 
+<p class="text-secondary">Manage your teaching claims</p> 
 
-    <h4>Your Submitted Claims</h4>
-    <table class="table table-dark table-striped">
-        <thead>
-            <tr>
-                <th>Submission Date</th>
-                <th>Status</th>
-                <th>Total Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Loop sample -->
-            <tr>
-                <td>2025-07-01</td>
-                <td>Pending</td>
-                <td>R3,000</td>
-            </tr>
-        </tbody>
-    </table>
+<div class="row g-4 mt-3">
+    <div class="col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h4 class="card-title fw-semibold">Submit New Claim</h4> 
+                <form class="mt-3">
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label> 
+                        <select class="form-select" id="subject">
+                            <option selected>Select assigned subject</option>
+                            <option value="1">Advanced Mathematics</option> 
+                            <option value="2">Computer Science Fundamentals</option> 
+                            <option value="3">Data Structures & Algorithms</option> 
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hours" class="form-label">Teaching Hours</label> 
+                        <input type="number" class="form-control" id="hours" placeholder="Enter hours taught">
+                    </div>
+                    <div class="mb-3">
+                        <label for="documents" class="form-label">Supporting Documents</label>
+                        <div class="text-center p-4 border border-2 rounded-3" style="border-style: dashed !important;">
+                            <i class="bi bi-cloud-upload fs-1 text-primary"></i> 
+                            <p class="text-primary fw-medium mb-0">Click to upload documents</p> 
+                            <small class="text-secondary">PDF, DOC, or image files</small> 
+                        </div>
+                        <input type="file" class="d-none" id="documents">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Submit Claim</button> 
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h4 class="card-title fw-semibold">Claim Status</h4> 
+                <div class="d-flex align-items-start p-3 border rounded-3 mb-3">
+                    <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        <i class="bi bi-clock-history text-white fs-5"></i> 
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-semibold">Advanced Mathematics - Week 12</span> 
+                            <small class="text-secondary">Dec 15, 2024</small> 
+                        </div>
+                        <small class="text-secondary">24 hours claimed</small> 
+                        <div class="mt-1"><span class="badge bg-warning-subtle text-warning-emphasis rounded-pill fw-medium">Pending Review</span></div> 
+                    </div>
+                </div>
+                <div class="d-flex align-items-start p-3 border rounded-3">
+                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        <i class="bi bi-check-circle-fill text-white fs-5"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-semibold">Computer Science - Week 10</span> 
+                            <small class="text-secondary">Dec 1, 2024</small> 
+                        </div>
+                        <small class="text-secondary">20 hours claimed</small> 
+                        <div class="mt-1"><span class="badge bg-success-subtle text-success-emphasis rounded-pill fw-medium">Approved</span></div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h4 class="card-title fw-semibold">Monthly Summary</h4> 
+                <div class="row text-center mt-3">
+                    <div class="col">
+                        <h2 class="fw-bold text-primary">62</h2> 
+                        <p class="text-secondary"><small>Total Hours</small></p> 
+                    </div>
+                    <div class="col">
+                        <h2 class="fw-bold text-warning">3</h2> 
+                        <p class="text-secondary"><small>Pending</small></p> 
+                    </div>
+                    <div class="col">
+                        <h2 class="fw-bold text-success">R12,400</h2> 
+                        <p class="text-secondary"><small>Approved Value</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

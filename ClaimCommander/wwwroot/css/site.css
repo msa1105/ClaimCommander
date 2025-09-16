@@ -17,3 +17,111 @@ h2, .text-success {
     border: none;
     color: black;
 }
+
+/* General Body and Font Styling */
+body {
+    background-color: #f8f9fa; /* A light grey background */
+    font-family: 'Inter', sans-serif; /* Set the default font */
+}
+
+/* Login Page Specific Styles */
+.login-container {
+    max-width: 450px;
+    margin: 8vh auto; /* Vertical and horizontal centering */
+    padding: 2.5rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #dee2e6;
+}
+
+    .login-container .brand-title {
+        font-family: 'Inter Tight', sans-serif;
+        font-weight: 700;
+        font-size: 2.5rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .login-container .brand-subtitle {
+        color: #6c757d; /* Secondary text color */
+        font-size: 1.1rem;
+        margin-bottom: 2.5rem;
+    }
+
+/* Style the form inputs to look modern */
+.form-control {
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid #ced4da;
+}
+
+.form-floating > .form-control {
+    height: calc(3.5rem + 2px);
+}
+
+.form-floating > label {
+    padding: 1rem 0.75rem;
+}
+
+/* --- DARK THEME STYLES --- */
+
+.dark-theme {
+    background-color: #0d1117; /* GitHub dark background */
+    color: #c9d1d9; /* GitHub dark text */
+}
+
+    /* Card and container styling */
+    .dark-theme .card {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+    }
+
+    /* Header and text colors */
+    .dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4, .dark-theme .card-title {
+        color: #f0f6fc;
+    }
+
+    .dark-theme .text-secondary {
+        color: #8b949e !important;
+    }
+
+    /* Form input styling */
+    .dark-theme .form-control, .dark-theme .form-select {
+        background-color: #0d1117;
+        color: #c9d1d9;
+        border: 1px solid #30363d;
+    }
+
+        .dark-theme .form-control:focus, .dark-theme .form-select:focus {
+            background-color: #0d1117;
+            color: #c9d1d9;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 0.25rem rgba(88, 166, 255, 0.25);
+        }
+
+    .dark-theme label {
+        color: #8b949e;
+    }
+
+    /* Button styling */
+    .dark-theme .btn-primary {
+        background-color: #5865f2; /* Discord-like purple/blue */
+        border-color: #5865f2;
+    }
+
+    /* Status badge overrides */
+    .dark-theme .bg-warning-subtle {
+        background-color: rgba(229, 165, 54, 0.15) !important;
+    }
+
+    .dark-theme .text-warning-emphasis {
+        color: #e5a536 !important;
+    }
+
+    .dark-theme .bg-success-subtle {
+        background-color: rgba(63, 185, 80, 0.15) !important;
+    }
+
+    .dark-theme .text-success-emphasis {
+        color: #3fb950 !important;
+    }

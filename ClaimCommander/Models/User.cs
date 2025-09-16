@@ -1,6 +1,6 @@
 ﻿namespace ClaimCommander.Models
 {
-    public class HourlyRate
+    public class User
     {
     }
 }
