@@ -1,83 +1,44 @@
+/* ---
+TABLE OF CONTENTS
+1.  General Layout & Fonts
+2.  Base Dark Theme
+3.  Dark Theme Components
+    - Navbar
+    - Cards
+    - Forms
+    - Buttons
+4.  Page-Specific Styles
+    - Login Page
+    - Dashboards (Claim Cards)
+--- */
+
+
+/* --- 1. General Layout & Fonts --- */
+html {
+    height: 100%;
+}
+
 body {
-    background-color: #0A0A0A;
-    color: white;
+    font-family: 'Inter', sans-serif;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-h2, .text-success {
-    color: #00FF00 !important;
+main {
+    flex-grow: 1; /* Pushes footer down on short pages */
 }
 
-.table {
-    background-color: #121212;
-    color: white;
-}
 
-.btn-success {
-    background-color: #00FF00;
-    border: none;
-    color: black;
-}
-
-/* General Body and Font Styling */
-body {
-    background-color: #f8f9fa; /* A light grey background */
-    font-family: 'Inter', sans-serif; /* Set the default font */
-}
-
-/* Login Page Specific Styles */
-.login-container {
-    max-width: 450px;
-    margin: 8vh auto; /* Vertical and horizontal centering */
-    padding: 2.5rem;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    border: 1px solid #dee2e6;
-}
-
-    .login-container .brand-title {
-        font-family: 'Inter Tight', sans-serif;
-        font-weight: 700;
-        font-size: 2.5rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .login-container .brand-subtitle {
-        color: #6c757d; /* Secondary text color */
-        font-size: 1.1rem;
-        margin-bottom: 2.5rem;
-    }
-
-/* Style the form inputs to look modern */
-.form-control {
-    border-radius: 8px;
-    padding: 1rem;
-    border: 1px solid #ced4da;
-}
-
-.form-floating > .form-control {
-    height: calc(3.5rem + 2px);
-}
-
-.form-floating > label {
-    padding: 1rem 0.75rem;
-}
-
-/* --- DARK THEME STYLES --- */
-
+/* --- 2. Base Dark Theme --- */
 .dark-theme {
-    background-color: #0d1117; /* GitHub dark background */
-    color: #c9d1d9; /* GitHub dark text */
+    background-color: #0d1117;
+    color: #8b949e; /* Default text color (soft grey) */
 }
 
-    /* Card and container styling */
-    .dark-theme .card {
-        background-color: #161b22;
-        border: 1px solid #30363d;
-    }
-
-    /* Header and text colors */
-    .dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4, .dark-theme .card-title {
+    /* Brighter text for headers and bolded content */
+    .dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4, .dark-theme h5,
+    .dark-theme .fw-semibold, .dark-theme .fw-bold {
         color: #f0f6fc;
     }
 
@@ -85,7 +46,30 @@ body {
         color: #8b949e !important;
     }
 
-    /* Form input styling */
+    .dark-theme a {
+        color: #58a6ff; /* Links */
+    }
+
+    /* Universal border color for dark theme */
+    .dark-theme .border-top, .dark-theme .border-bottom {
+        border-color: #30363d !important;
+    }
+
+
+    /* --- 3. Dark Theme Components --- */
+
+    /* Navbar */
+    .dark-theme .navbar {
+        background-color: #161b22 !important;
+    }
+
+    /* Cards */
+    .dark-theme .card {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+    }
+
+    /* Forms */
     .dark-theme .form-control, .dark-theme .form-select {
         background-color: #0d1117;
         color: #c9d1d9;
@@ -95,33 +79,138 @@ body {
         .dark-theme .form-control:focus, .dark-theme .form-select:focus {
             background-color: #0d1117;
             color: #c9d1d9;
-            border-color: #58a6ff;
-            box-shadow: 0 0 0 0.25rem rgba(88, 166, 255, 0.25);
+            border-color: #8b949e;
+            box-shadow: none;
         }
 
     .dark-theme label {
         color: #8b949e;
     }
 
-    /* Button styling */
+    .dark-theme .form-floating > .form-control {
+        height: calc(3.5rem + 2px);
+    }
+
+    .dark-theme .form-floating > label {
+        padding: 1rem 0.75rem;
+    }
+
+    /* Buttons */
     .dark-theme .btn-primary {
-        background-color: #5865f2; /* Discord-like purple/blue */
-        border-color: #5865f2;
+        background-color: #21262d;
+        border-color: #30363d;
+        color: #f0f6fc;
     }
 
-    /* Status badge overrides */
-    .dark-theme .bg-warning-subtle {
-        background-color: rgba(229, 165, 54, 0.15) !important;
+        .dark-theme .btn-primary:hover {
+            background-color: #30363d;
+            border-color: #8b949e;
+        }
+
+    .dark-theme .btn-outline-danger {
+        color: #f85149;
+        border-color: #f85149;
     }
 
-    .dark-theme .text-warning-emphasis {
-        color: #e5a536 !important;
+        .dark-theme .btn-outline-danger:hover {
+            color: #fff;
+            background-color: #f85149;
+        }
+
+    .dark-theme .btn-outline-warning {
+        color: #e3b341;
+        border-color: #e3b341;
     }
 
-    .dark-theme .bg-success-subtle {
-        background-color: rgba(63, 185, 80, 0.15) !important;
+        .dark-theme .btn-outline-warning:hover {
+            color: #0d1117;
+            background-color: #e3b341;
+        }
+
+    .dark-theme .btn-outline-success {
+        color: #3fb950;
+        border-color: #3fb950;
     }
 
-    .dark-theme .text-success-emphasis {
-        color: #3fb950 !important;
+        .dark-theme .btn-outline-success:hover {
+            color: #fff;
+            background-color: #3fb950;
+        }
+
+
+/* --- 4. Page-Specific Styles --- */
+
+/* Login Page */
+.login-container {
+    max-width: 450px;
+    margin: 8vh auto;
+    padding: 2.5rem;
+    background-color: #161b22; /* Use card color */
+    border-radius: 12px;
+    border: 1px solid #30363d;
+}
+
+    .login-container .brand-title {
+        font-family: 'Inter Tight', sans-serif;
+        font-weight: 700;
+        font-size: 2.5rem;
+        color: white;
+        margin-bottom: 0.25rem;
     }
+
+    .login-container .brand-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 2.5rem;
+        color: white;
+    }
+
+/* Dashboards (Unified Claim Card Style) */
+.claim-card {
+    border-left-width: 5px !important;
+}
+
+.claim-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.claim-card.border-warning {
+    border-left-color: #e3b341 !important;
+}
+
+.claim-card.border-success {
+    border-left-color: #3fb950 !important;
+}
+
+.claim-card.border-danger {
+    border-left-color: #f85149 !important;
+}
+
+.claim-card.border-primary {
+    border-left-color: #58a6ff !important;
+}
+
+.dark-theme .claim-card-icon.bg-warning {
+    background-color: rgba(227, 179, 65, 0.15) !important;
+    color: #e3b341;
+}
+
+.dark-theme .claim-card-icon.bg-success {
+    background-color: rgba(63, 185, 80, 0.15) !important;
+    color: #3fb950;
+}
+
+.dark-theme .claim-card-icon.bg-danger {
+    background-color: rgba(248, 81, 73, 0.15) !important;
+    color: #f85149;
+}
+
+.dark-theme .claim-card-icon.bg-primary {
+    background-color: rgba(88, 166, 255, 0.15) !important;
+    color: #58a6ff;
+}

@@ -1,96 +1,91 @@
-﻿@{
+﻿@model LecturerDashboardViewModel
+@{
     ViewData["Title"] = "Lecturer Dashboard";
 }
 
-<h2 class="display-6 fw-bold">Lecturer Dashboard</h2> 
-<p class="text-secondary">Manage your teaching claims</p> 
+<div class="mb-4">
+    <h2 class="display-6 fw-bold">Lecturer Dashboard</h2>
+    <p class="text-secondary">Manage your teaching claims</p>
+</div>
 
-<div class="row g-4 mt-3">
-    <div class="col-lg-5">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h4 class="card-title fw-semibold">Submit New Claim</h4> 
-                <form class="mt-3">
-                    <div class="mb-3">
-                        <label for="subject" class="form-label">Subject</label> 
-                        <select class="form-select" id="subject">
-                            <option selected>Select assigned subject</option>
-                            <option value="1">Advanced Mathematics</option> 
-                            <option value="2">Computer Science Fundamentals</option> 
-                            <option value="3">Data Structures & Algorithms</option> 
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="hours" class="form-label">Teaching Hours</label> 
-                        <input type="number" class="form-control" id="hours" placeholder="Enter hours taught">
-                    </div>
-                    <div class="mb-3">
-                        <label for="documents" class="form-label">Supporting Documents</label>
-                        <div class="text-center p-4 border border-2 rounded-3" style="border-style: dashed !important;">
-                            <i class="bi bi-cloud-upload fs-1 text-primary"></i> 
-                            <p class="text-primary fw-medium mb-0">Click to upload documents</p> 
-                            <small class="text-secondary">PDF, DOC, or image files</small> 
-                        </div>
-                        <input type="file" class="d-none" id="documents">
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Submit Claim</button> 
-                    </div>
-                </form>
+<div class="card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h4 class="card-title fw-semibold">Submit New Claim</h4>
+        <form class="mt-3" method="post">
+            <div class="mb-3">
+                <label asp-for="NewClaimForm.SelectedSubjectId" class="form-label">Subject</label>
+                <select asp-for="NewClaimForm.SelectedSubjectId" asp-items="Model.NewClaimForm.Subjects" class="form-select">
+                    <option disabled selected>Select assigned subject</option>
+                </select>
             </div>
-        </div>
+            <div class="mb-3">
+                <label asp-for="NewClaimForm.HoursWorked" class="form-label">Teaching Hours</label>
+                <input asp-for="NewClaimForm.HoursWorked" class="form-control" placeholder="Enter hours taught">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Supporting Documents</label>
+                <div class="text-center p-4 border border-2 rounded-3" style="border-style: dashed !important; border-color: #30363d !important; cursor: pointer;">
+                    <i class="bi bi-cloud-upload fs-1" style="color: #5865f2;"></i>
+                    <p class="mb-0 fw-medium" style="color: #5865f2;">Click to upload documents</p>
+                    <small class="text-secondary">PDF, DOC, or image files</small>
+                </div>
+                <input type="file" class="d-none" id="documents">
+            </div>
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary btn-lg" style="padding: 0.75rem;">Submit Claim</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <div class="col-lg-7">
-        <div class="card shadow-sm mb-4">
-            <div class="card-body p-4">
-                <h4 class="card-title fw-semibold">Claim Status</h4> 
-                <div class="d-flex align-items-start p-3 border rounded-3 mb-3">
-                    <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                        <i class="bi bi-clock-history text-white fs-5"></i> 
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between">
-                            <span class="fw-semibold">Advanced Mathematics - Week 12</span> 
-                            <small class="text-secondary">Dec 15, 2024</small> 
-                        </div>
-                        <small class="text-secondary">24 hours claimed</small> 
-                        <div class="mt-1"><span class="badge bg-warning-subtle text-warning-emphasis rounded-pill fw-medium">Pending Review</span></div> 
-                    </div>
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-semibold">Claim Status</h5>
+        <a href="#" class="btn btn-link text-decoration-none">View All</a>
+    </div>
+    <div class="card-body">
+        @foreach (var claim in Model.RecentClaims)
+        {
+            <div class="d-flex align-items-start p-3 border rounded-3 mb-3" style="border-color: #30363d !important;">
+                @{
+                    var statusClass = claim.Status == "Approved" ? "success" : claim.Status == "Pending" ? "warning" : "primary";
+                    var statusIcon = claim.Status == "Approved" ? "bi-check-circle-fill" : claim.Status == "Pending" ? "bi-clock-history" : "bi-arrow-repeat";
+                }
+                <div class="bg-@statusClass rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; opacity: 0.7;">
+                    <i class="bi @statusIcon text-white fs-5"></i>
                 </div>
-                <div class="d-flex align-items-start p-3 border rounded-3">
-                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                        <i class="bi bi-check-circle-fill text-white fs-5"></i>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-semibold">@claim.Subject.Name</span>
+                        <small class="text-secondary">@claim.SubmissionDate.ToString("MMM d, yyyy")</small>
                     </div>
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between">
-                            <span class="fw-semibold">Computer Science - Week 10</span> 
-                            <small class="text-secondary">Dec 1, 2024</small> 
-                        </div>
-                        <small class="text-secondary">20 hours claimed</small> 
-                        <div class="mt-1"><span class="badge bg-success-subtle text-success-emphasis rounded-pill fw-medium">Approved</span></div> 
+                    <small class="text-secondary">@claim.HoursWorked hours claimed</small>
+                    <div class="mt-1 d-flex align-items-center">
+                        <span class="badge rounded-pill status-badge">@claim.Status</span>
                     </div>
                 </div>
             </div>
-        </div>
+        }
+    </div>
+</div>
 
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h4 class="card-title fw-semibold">Monthly Summary</h4> 
-                <div class="row text-center mt-3">
-                    <div class="col">
-                        <h2 class="fw-bold text-primary">62</h2> 
-                        <p class="text-secondary"><small>Total Hours</small></p> 
-                    </div>
-                    <div class="col">
-                        <h2 class="fw-bold text-warning">3</h2> 
-                        <p class="text-secondary"><small>Pending</small></p> 
-                    </div>
-                    <div class="col">
-                        <h2 class="fw-bold text-success">R12,400</h2> 
-                        <p class="text-secondary"><small>Approved Value</small></p>
-                    </div>
-                </div>
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-transparent">
+        <h5 class="mb-0 fw-semibold">Monthly Summary</h5>
+    </div>
+    <div class="card-body p-4">
+        <div class="row text-center">
+            <div class="col-4">
+                <h2 class="fw-bold display-5">@Model.TotalHoursMonth</h2>
+                <p class="text-secondary">Total Hours</p>
+            </div>
+            <div class="col-4">
+                <h2 class="fw-bold display-5 text-warning">@Model.PendingClaimsCount</h2>
+                <p class="text-secondary">Pending</p>
+            </div>
+            <div class="col-4">
+                <h2 class="fw-bold display-5 text-success">@Model.ApprovedValueMonth.ToString("C", new System.Globalization.CultureInfo("en-ZA"))</h2>
+                <p class="text-secondary">Approved Value</p>
             </div>
         </div>
     </div>
