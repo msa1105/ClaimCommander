@@ -1,132 +1,130 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using ClaimCommander.Data;
 using ClaimCommander.Models;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.IO;
+using ClaimCommander.Services;
 
-public class LecturerController : Controller
+namespace ClaimCommander.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public LecturerController(ApplicationDbContext context)
+    public class LecturerController : Controller
     {
-        _context = context;
-    }
+        private readonly IClaimStorageService _storage;
+        private readonly IFileEncryptionService _encryption;
+        private readonly IWebHostEnvironment _environment;
+        private const long MaxFileSize = 5 * 1024 * 1024; // 5MB
+        private readonly string[] AllowedExtensions = { ".pdf", ".docx", ".xlsx" };
 
-    // Helper method to prepare the ViewModel
-    private async Task<LecturerDashboardViewModel> PrepareDashboardViewModel(int userId)
-    {
-        var userClaims = await _context.Claims
-                               .Where(c => c.LecturerId == userId)
-                               .Include(c => c.Subject)
-                               .OrderByDescending(c => c.SubmissionDate)
-                               .ToListAsync();
-
-        return new LecturerDashboardViewModel
+        public LecturerController(
+            IClaimStorageService storage,
+            IFileEncryptionService encryption,
+            IWebHostEnvironment environment)
         {
-            RecentClaims = userClaims,
-            TotalHoursMonth = userClaims.Sum(c => c.HoursWorked),
-            PendingClaimsCount = userClaims.Count(c => c.Status == "Pending"),
-            ApprovedValueMonth = userClaims.Where(c => c.Status == "Approved").Sum(c => c.ClaimValue),
-            NewClaimForm = new NewClaimViewModel
-            {
-                Subjects = new SelectList(_context.Subjects, "SubjectId", "Name")
-            }
-        };
-    }
-
-    // GET: Displays the dashboard
-    public async Task<IActionResult> Dashboard()
-    {
-        var userId = HttpContext.Session.GetInt32("UserId");
-        if (userId == null)
-        {
-            return RedirectToAction("Login", "Account");
+            _storage = storage;
+            _encryption = encryption;
+            _environment = environment;
         }
 
-        var viewModel = await PrepareDashboardViewModel(userId.Value);
-        return View(viewModel);
-    }
-
-    // POST: Handles the form submission
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SubmitClaim(NewClaimViewModel newClaim, IFormFile documentFile)
-    {
-        var userId = HttpContext.Session.GetInt32("UserId");
-        if (userId == null)
+        [HttpGet]
+        public IActionResult SubmitClaim()
         {
-            TempData["ErrorMessage"] = "Your session has expired. Please log in again.";
-            return RedirectToAction("Login", "Account");
+            return View(new Claim());
         }
 
-        // --- Model Validation Logic ---
-        if (!ModelState.IsValid)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitClaim(Claim claim, IFormFile? documentFile)
         {
-            TempData["ErrorMessage"] = "Failed to submit claim. Please check the form for errors.";
-            // Rebuild the full view model and return the view directly to display errors
-            var viewModel = await PrepareDashboardViewModel(userId.Value);
-            viewModel.NewClaimForm = newClaim; // Keep the user's invalid input
-            return View("Dashboard", viewModel);
-        }
-
-        // --- Database & File Logic ---
-        try
-        {
-            var lecturer = await _context.Users.FindAsync(userId);
-            if (lecturer == null)
+            try
             {
-                TempData["ErrorMessage"] = "Could not find your user record.";
-                return RedirectToAction(nameof(Dashboard));
-            }
-
-            var claim = new Claim
-            {
-                LecturerId = lecturer.UserId,
-                SubjectId = newClaim.SelectedSubjectId,
-                HoursWorked = (decimal)newClaim.HoursWorked,
-                SubmissionDate = DateTime.Now,
-                Status = "Pending",
-                ClaimValue = (decimal)newClaim.HoursWorked * lecturer.HourlyRate
-            };
-
-            _context.Add(claim);
-            await _context.SaveChangesAsync();
-
-            if (documentFile != null && documentFile.Length > 0)
-            {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(documentFile.FileName);
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                if (!ModelState.IsValid)
                 {
-                    await documentFile.CopyToAsync(stream);
+                    TempData["ErrorMessage"] = "Please correct the errors in the form.";
+                    return View(claim);
                 }
 
-                var document = new Document
+                // Handle file upload if provided
+                if (documentFile != null)
                 {
-                    ClaimId = claim.ClaimId,
-                    FileName = documentFile.FileName,
-                    FilePath = "/uploads/" + uniqueFileName
-                };
-                _context.Documents.Add(document);
-                await _context.SaveChangesAsync();
-            }
+                    var validationError = ValidateFile(documentFile);
+                    if (validationError != null)
+                    {
+                        TempData["ErrorMessage"] = validationError;
+                        return View(claim);
+                    }
 
-            TempData["SuccessMessage"] = "Claim submitted successfully!";
-            return RedirectToAction(nameof(Dashboard));
+                    var uploadPath = Path.Combine(_environment.WebRootPath, "uploads");
+                    var encryptedPath = await _encryption.EncryptAndSaveFileAsync(documentFile, uploadPath);
+
+                    claim.Documents.Add(new DocumentInfo
+                    {
+                        FileName = documentFile.FileName,
+                        EncryptedFilePath = encryptedPath,
+                        FileSize = documentFile.Length
+                    });
+                }
+
+                var claimId = _storage.AddClaim(claim);
+                TempData["SuccessMessage"] = $"Claim submitted successfully! Claim ID: {claimId}";
+                return RedirectToAction(nameof(ViewClaims));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error submitting claim: {ex.Message}";
+                return View(claim);
+            }
         }
-        catch (Exception ex)
+
+        [HttpGet]
+        public IActionResult ViewClaims()
         {
-            // In a real app, you would log the exception 'ex'
-            TempData["ErrorMessage"] = $"Failed to submit claim due to a system error.";
-            return RedirectToAction(nameof(Dashboard));
+            var claims = _storage.GetAllClaims();
+            return View(claims);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DownloadDocument(int claimId, int documentIndex)
+        {
+            try
+            {
+                var claim = _storage.GetClaim(claimId);
+                if (claim == null || documentIndex >= claim.Documents.Count)
+                {
+                    return NotFound("Document not found");
+                }
+
+                var document = claim.Documents[documentIndex];
+                var decryptedBytes = await _encryption.DecryptFileAsync(document.EncryptedFilePath);
+
+                var contentType = GetContentType(document.FileName);
+                return File(decryptedBytes, contentType, document.FileName);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Error downloading document: {ex.Message}";
+                return RedirectToAction(nameof(ViewClaims));
+            }
+        }
+
+        private string? ValidateFile(IFormFile file)
+        {
+            if (file.Length > MaxFileSize)
+                return $"File size exceeds the maximum limit of {MaxFileSize / 1024 / 1024}MB.";
+
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!AllowedExtensions.Contains(extension))
+                return $"Invalid file type. Only {string.Join(", ", AllowedExtensions)} files are allowed.";
+
+            return null;
+        }
+
+        private string GetContentType(string fileName)
+        {
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+            return extension switch
+            {
+                ".pdf" => "application/pdf",
+                ".docx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                _ => "application/octet-stream"
+            };
         }
     }
 }
