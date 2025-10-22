@@ -15,23 +15,30 @@ public class LecturerController : Controller
         _context = context;
     }
 
-    // GET: Displays the dashboard
     public async Task<IActionResult> Dashboard()
     {
+        // Get the logged-in user's ID from the session
+        var userId = HttpContext.Session.GetInt32("UserId");
+        if (userId == null)
+        {
+            // If no user is logged in, redirect to the login page
+            return RedirectToAction("Login", "Account");
+        }
+
+        // Fetch claims that belong ONLY to the logged-in user
+        var userClaims = await _context.Claims
+                            .Where(c => c.LecturerId == userId)
+                            .Include(c => c.Subject)
+                            .OrderByDescending(c => c.SubmissionDate)
+                            .ToListAsync();
+
         var viewModel = new LecturerDashboardViewModel
         {
-            // Fetch real claims from the database for the current user (mocked for now)
-            RecentClaims = await _context.Claims
-                                .Include(c => c.Subject) // Include subject details
-                                .OrderByDescending(c => c.SubmissionDate)
-                                .ToListAsync(),
-
-            // Monthly Summary (can be calculated later)
-            TotalHoursMonth = 62,
-            PendingClaimsCount = 3,
-            ApprovedValueMonth = 12400,
-
-            // Populate the dropdown for the form
+            RecentClaims = userClaims,
+            // You can calculate these values based on userClaims later
+            TotalHoursMonth = userClaims.Sum(c => c.HoursWorked),
+            PendingClaimsCount = userClaims.Count(c => c.Status == "Pending"),
+            ApprovedValueMonth = userClaims.Where(c => c.Status == "Approved").Sum(c => c.ClaimValue),
             NewClaimForm = new NewClaimViewModel
             {
                 Subjects = new SelectList(_context.Subjects, "SubjectId", "Name")
@@ -41,16 +48,19 @@ public class LecturerController : Controller
         return View(viewModel);
     }
 
-    // POST: Handles the form submission
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SubmitClaim(NewClaimViewModel newClaim)
+    public async Task<IActionResult> SubmitClaim(NewClaimViewModel newClaim, IFormFile documentFile)
     {
+        var userId = HttpContext.Session.GetInt32("UserId");
+        if (userId == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
         if (ModelState.IsValid)
         {
-            // For now, we will mock the lecturer's details
-            var lecturer = _context.Users.FirstOrDefault(u => u.Role == "Lecturer"); // Find a mock lecturer
-            var subject = _context.Subjects.Find(newClaim.SelectedSubjectId);
+            var lecturer = await _context.Users.FindAsync(userId);
 
             var claim = new Claim
             {
@@ -59,17 +69,39 @@ public class LecturerController : Controller
                 HoursWorked = (decimal)newClaim.HoursWorked,
                 SubmissionDate = DateTime.Now,
                 Status = "Pending",
-                ClaimValue = (decimal)newClaim.HoursWorked * lecturer.HourlyRate // Calculate value
+                ClaimValue = (decimal)newClaim.HoursWorked * lecturer.HourlyRate
             };
 
             _context.Add(claim);
             await _context.SaveChangesAsync();
 
+            // File Upload Logic
+            if (documentFile != null && documentFile.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(documentFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await documentFile.CopyToAsync(stream);
+                }
+
+                var document = new Document
+                {
+                    ClaimId = claim.ClaimId,
+                    FileName = documentFile.FileName,
+                    FilePath = "/uploads/" + uniqueFileName
+                };
+                _context.Documents.Add(document);
+                await _context.SaveChangesAsync();
+            }
+
             return RedirectToAction(nameof(Dashboard));
         }
-
-        // If model is not valid, return to the dashboard to show errors
-        // You'll need to re-populate the ViewModel here, but for now we'll keep it simple
         return RedirectToAction(nameof(Dashboard));
     }
 }

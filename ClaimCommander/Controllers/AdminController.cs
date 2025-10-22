@@ -1,22 +1,63 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using ClaimCommander.Data;
+using ClaimCommander.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
-/// <summary>
-/// Controller for the admin's claim review dashboard from adminpage.txt.
-/// </summary>
 public class AdminController : Controller
 {
-    public IActionResult Dashboard()
-    {
-        // Create mock data that combines user, claim, and subject info.
-        var mockAdminClaims = new List<AdminClaimViewModel>
-        {
-            new AdminClaimViewModel { ClaimId = 1, LecturerName = "Dr. Sarah Mitchell", Department = "Mathematics Department", SubjectName = "Advanced Calculus", Status = "Pending", HoursWorked = 24, ClaimValue = 7200.00m, SubmittedAgo = "2 days ago" },
-            new AdminClaimViewModel { ClaimId = 2, LecturerName = "Prof. James Kowalski", Department = "Physics Department", SubjectName = "Quantum Physics", Status = "Approved", HoursWorked = 18, ClaimValue = 5400.00m, SubmittedAgo = "1 week ago" },
-            new AdminClaimViewModel { ClaimId = 3, LecturerName = "Dr. Lisa Martinez", Department = "Chemistry Department", SubjectName = "Organic Chemistry", Status = "Pending", HoursWorked = 30, ClaimValue = 9000.00m, SubmittedAgo = "5 days ago" },
-            new AdminClaimViewModel { ClaimId = 4, LecturerName = "Dr. Robert Thompson", Department = "Biology Department", SubjectName = "Molecular Biology", Status = "Denied", HoursWorked = 22, ClaimValue = 6600.00m, SubmittedAgo = "2 weeks ago" }
-        };
+    private readonly ApplicationDbContext _context;
 
-        return View(mockAdminClaims);
+    public AdminController(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<IActionResult> Dashboard()
+    {
+        var pendingClaims = await _context.Claims
+            .Where(c => c.Status == "Pending")
+            .Include(c => c.Lecturer) // Get lecturer details
+            .Include(c => c.Subject)  // Get subject details
+            .Select(c => new AdminClaimViewModel
+            {
+                ClaimId = c.ClaimId,
+                LecturerName = c.Lecturer.FullName,
+                Department = c.Lecturer.Department,
+                SubjectName = c.Subject.Name,
+                Status = c.Status,
+                HoursWorked = c.HoursWorked,
+                ClaimValue = c.ClaimValue,
+                SubmittedAgo = "X days ago" // This can be calculated
+            }).ToListAsync();
+
+        return View(pendingClaims);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ApproveClaim(int claimId)
+    {
+        var claim = await _context.Claims.FindAsync(claimId);
+        if (claim != null)
+        {
+            claim.Status = "Approved";
+            await _context.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Dashboard));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RejectClaim(int claimId)
+    {
+        var claim = await _context.Claims.FindAsync(claimId);
+        if (claim != null)
+        {
+            claim.Status = "Rejected";
+            await _context.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Dashboard));
     }
 }

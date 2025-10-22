@@ -1,5 +1,4 @@
-﻿// In your ViewModels folder
-
+﻿namespace ClaimCommander.Models;
 /// <summary>
 /// Represents a single claim card on the admin dashboard.
 /// </summary>

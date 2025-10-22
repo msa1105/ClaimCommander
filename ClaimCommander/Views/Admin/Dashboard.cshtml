@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AdminClaimViewModel>
+﻿@model IEnumerable<ClaimCommander.Models.AdminClaimViewModel>;
 @{
     ViewData["Title"] = "Admin Dashboard";
 }
@@ -47,9 +47,17 @@
 
                         <div class="border-top mt-3 pt-3">
                             <div class="btn-group w-100" role="group">
-                                <a href="#" class="btn btn-sm btn-outline-danger">Deny</a>
-                                <a href="#" class="btn btn-sm btn-outline-warning">Review</a>
-                                <a href="#" class="btn btn-sm btn-outline-success">Approve</a>
+                                <form asp-controller="Admin" asp-action="RejectClaim" asp-route-claimId="@claim.ClaimId" method="post" class="flex-fill">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">Deny</button>
+                                </form>
+
+                                <a href="#" class="btn btn-sm btn-outline-warning flex-fill">Review</a>
+
+                                <form asp-controller="Admin" asp-action="ApproveClaim" asp-route-claimId="@claim.ClaimId" method="post" class="flex-fill">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-success w-100">Approve</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -57,3 +65,4 @@
             </div>
         </div>
     }
+</div>
