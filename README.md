@@ -1,6 +1,5 @@
 # 📋 ClaimCommander - Contract Monthly Claim System
 
-\<div align-center"\>
 
 [](https://dotnet.microsoft.com/)
 [](https://docs.microsoft.com/en-us/dotnet/csharp/)
@@ -8,7 +7,6 @@
 
 **A functional web-based prototype of a Contract Monthly Claim System for academic institutions.**
 
-\</div\>
 
 ## 🎯 Overview
 
