@@ -1,5 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ClaimCommander.Models;
 using ClaimCommander.Services;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ClaimCommander.Controllers
 {
@@ -7,11 +13,14 @@ namespace ClaimCommander.Controllers
     {
         private readonly IClaimStorageService _storage;
         private readonly IFileEncryptionService _encryption;
+        private readonly IWebHostEnvironment _webHostEnvironment; // Added service
 
-        public CoordinatorController(IClaimStorageService storage, IFileEncryptionService encryption)
+        // Updated constructor
+        public CoordinatorController(IClaimStorageService storage, IFileEncryptionService encryption, IWebHostEnvironment webHostEnvironment)
         {
             _storage = storage;
             _encryption = encryption;
+            _webHostEnvironment = webHostEnvironment; // Assign service
         }
 
         [HttpGet]
@@ -80,13 +89,18 @@ namespace ClaimCommander.Controllers
             try
             {
                 var claim = _storage.GetClaim(claimId);
-                if (claim == null || documentIndex >= claim.Documents.Count)
+                if (claim == null || documentIndex < 0 || documentIndex >= claim.Documents.Count)
                 {
                     return NotFound("Document not found");
                 }
 
                 var document = claim.Documents[documentIndex];
-                var decryptedBytes = await _encryption.DecryptFileAsync(document.EncryptedFilePath);
+
+                // --- PATH CORRECTION ---
+                var webRootPath = _webHostEnvironment.WebRootPath;
+                var fullEncryptedPath = Path.Combine(webRootPath, document.EncryptedFilePath.TrimStart('/'));
+
+                var decryptedBytes = await _encryption.DecryptFileAsync(fullEncryptedPath);
 
                 var contentType = GetContentType(document.FileName);
                 return File(decryptedBytes, contentType, document.FileName);
