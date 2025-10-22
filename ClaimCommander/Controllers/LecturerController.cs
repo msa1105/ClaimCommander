@@ -5,6 +5,8 @@ using ClaimCommander.Models;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.IO;
 
 public class LecturerController : Controller
 {
@@ -15,27 +17,18 @@ public class LecturerController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Dashboard()
+    // Helper method to prepare the ViewModel
+    private async Task<LecturerDashboardViewModel> PrepareDashboardViewModel(int userId)
     {
-        // Get the logged-in user's ID from the session
-        var userId = HttpContext.Session.GetInt32("UserId");
-        if (userId == null)
-        {
-            // If no user is logged in, redirect to the login page
-            return RedirectToAction("Login", "Account");
-        }
-
-        // Fetch claims that belong ONLY to the logged-in user
         var userClaims = await _context.Claims
-                            .Where(c => c.LecturerId == userId)
-                            .Include(c => c.Subject)
-                            .OrderByDescending(c => c.SubmissionDate)
-                            .ToListAsync();
+                               .Where(c => c.LecturerId == userId)
+                               .Include(c => c.Subject)
+                               .OrderByDescending(c => c.SubmissionDate)
+                               .ToListAsync();
 
-        var viewModel = new LecturerDashboardViewModel
+        return new LecturerDashboardViewModel
         {
             RecentClaims = userClaims,
-            // You can calculate these values based on userClaims later
             TotalHoursMonth = userClaims.Sum(c => c.HoursWorked),
             PendingClaimsCount = userClaims.Count(c => c.Status == "Pending"),
             ApprovedValueMonth = userClaims.Where(c => c.Status == "Approved").Sum(c => c.ClaimValue),
@@ -44,13 +37,10 @@ public class LecturerController : Controller
                 Subjects = new SelectList(_context.Subjects, "SubjectId", "Name")
             }
         };
-
-        return View(viewModel);
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SubmitClaim(NewClaimViewModel newClaim, IFormFile documentFile)
+    // GET: Displays the dashboard
+    public async Task<IActionResult> Dashboard()
     {
         var userId = HttpContext.Session.GetInt32("UserId");
         if (userId == null)
@@ -58,9 +48,41 @@ public class LecturerController : Controller
             return RedirectToAction("Login", "Account");
         }
 
-        if (ModelState.IsValid)
+        var viewModel = await PrepareDashboardViewModel(userId.Value);
+        return View(viewModel);
+    }
+
+    // POST: Handles the form submission
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SubmitClaim(NewClaimViewModel newClaim, IFormFile documentFile)
+    {
+        var userId = HttpContext.Session.GetInt32("UserId");
+        if (userId == null)
+        {
+            TempData["ErrorMessage"] = "Your session has expired. Please log in again.";
+            return RedirectToAction("Login", "Account");
+        }
+
+        // --- Model Validation Logic ---
+        if (!ModelState.IsValid)
+        {
+            TempData["ErrorMessage"] = "Failed to submit claim. Please check the form for errors.";
+            // Rebuild the full view model and return the view directly to display errors
+            var viewModel = await PrepareDashboardViewModel(userId.Value);
+            viewModel.NewClaimForm = newClaim; // Keep the user's invalid input
+            return View("Dashboard", viewModel);
+        }
+
+        // --- Database & File Logic ---
+        try
         {
             var lecturer = await _context.Users.FindAsync(userId);
+            if (lecturer == null)
+            {
+                TempData["ErrorMessage"] = "Could not find your user record.";
+                return RedirectToAction(nameof(Dashboard));
+            }
 
             var claim = new Claim
             {
@@ -75,14 +97,11 @@ public class LecturerController : Controller
             _context.Add(claim);
             await _context.SaveChangesAsync();
 
-            // File Upload Logic
             if (documentFile != null && documentFile.Length > 0)
             {
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
                 var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(documentFile.FileName);
                 var filePath = Path.Combine(uploadsFolder, uniqueFileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
@@ -100,8 +119,14 @@ public class LecturerController : Controller
                 await _context.SaveChangesAsync();
             }
 
+            TempData["SuccessMessage"] = "Claim submitted successfully!";
             return RedirectToAction(nameof(Dashboard));
         }
-        return RedirectToAction(nameof(Dashboard));
+        catch (Exception ex)
+        {
+            // In a real app, you would log the exception 'ex'
+            TempData["ErrorMessage"] = $"Failed to submit claim due to a system error.";
+            return RedirectToAction(nameof(Dashboard));
+        }
     }
 }

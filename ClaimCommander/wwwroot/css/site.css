@@ -10,7 +10,7 @@ TABLE OF CONTENTS
 4.  Page-Specific Styles
     - Login Page
     - Dashboards (Claim Cards)
---- */  
+--- */
 
 
 /* --- 1. General Layout & Fonts --- */
@@ -26,17 +26,16 @@ body {
 }
 
 main {
-    flex-grow: 1; /* Pushes footer down on short pages */
+    flex-grow: 1;
 }
 
 
 /* --- 2. Base Dark Theme --- */
 .dark-theme {
     background-color: #0d1117;
-    color: #8b949e; /* Default text color (soft grey) */
+    color: #8b949e;
 }
 
-    /* Brighter text for headers and bolded content */
     .dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4, .dark-theme h5,
     .dark-theme .fw-semibold, .dark-theme .fw-bold {
         color: #f0f6fc;
@@ -47,10 +46,9 @@ main {
     }
 
     .dark-theme a {
-        color: #58a6ff; /* Links */
+        color: #58a6ff;
     }
 
-    /* Universal border color for dark theme */
     .dark-theme .border-top, .dark-theme .border-bottom {
         border-color: #30363d !important;
     }
@@ -67,6 +65,11 @@ main {
     .dark-theme .card {
         background-color: #161b22;
         border: 1px solid #30363d;
+    }
+
+    .dark-theme .card-header {
+        background-color: #161b22;
+        border-bottom: 1px solid #30363d;
     }
 
     /* Forms */
@@ -137,6 +140,17 @@ main {
             background-color: #3fb950;
         }
 
+    /* Badge Styles */
+    .dark-theme .badge {
+        font-weight: 500;
+    }
+
+    .dark-theme .status-badge {
+        background-color: rgba(88, 166, 255, 0.15);
+        color: #58a6ff;
+        border: 1px solid rgba(88, 166, 255, 0.25);
+    }
+
 
 /* --- 4. Page-Specific Styles --- */
 
@@ -145,7 +159,7 @@ main {
     max-width: 450px;
     margin: 8vh auto;
     padding: 2.5rem;
-    background-color: #161b22; /* Use card color */
+    background-color: #161b22;
     border-radius: 12px;
     border: 1px solid #30363d;
 }
@@ -164,7 +178,38 @@ main {
         color: white;
     }
 
-/* Dashboards (Unified Claim Card Style) */
+/* Admin Dashboard - Status Item Icons */
+.status-item-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dark-theme .status-item-card-icon.bg-warning {
+    background-color: rgba(227, 179, 65, 0.15);
+    color: #e3b341;
+}
+
+.dark-theme .status-item-card-icon.bg-success {
+    background-color: rgba(63, 185, 80, 0.15);
+    color: #3fb950;
+}
+
+.dark-theme .status-item-card-icon.bg-danger {
+    background-color: rgba(248, 81, 73, 0.15);
+    color: #f85149;
+}
+
+.dark-theme .status-item-card-icon.bg-primary {
+    background-color: rgba(88, 166, 255, 0.15);
+    color: #58a6ff;
+}
+
+/* Lecturer Dashboard - Claim Cards */
 .claim-card {
     border-left-width: 5px !important;
 }
@@ -196,21 +241,21 @@ main {
 }
 
 .dark-theme .claim-card-icon.bg-warning {
-    background-color: rgba(227, 179, 65, 0.15) !important;
+    background-color: rgba(227, 179, 65, 0.15);
     color: #e3b341;
 }
 
 .dark-theme .claim-card-icon.bg-success {
-    background-color: rgba(63, 185, 80, 0.15) !important;
+    background-color: rgba(63, 185, 80, 0.15);
     color: #3fb950;
 }
 
 .dark-theme .claim-card-icon.bg-danger {
-    background-color: rgba(248, 81, 73, 0.15) !important;
+    background-color: rgba(248, 81, 73, 0.15);
     color: #f85149;
 }
 
 .dark-theme .claim-card-icon.bg-primary {
-    background-color: rgba(88, 166, 255, 0.15) !important;
+    background-color: rgba(88, 166, 255, 0.15);
     color: #58a6ff;
 }

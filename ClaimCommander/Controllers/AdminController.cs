@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ClaimCommander.Data;
-using ClaimCommander.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
+using ClaimCommander.Models;
 
 public class AdminController : Controller
 {
@@ -16,10 +17,10 @@ public class AdminController : Controller
 
     public async Task<IActionResult> Dashboard()
     {
-        var pendingClaims = await _context.Claims
-            .Where(c => c.Status == "Pending")
-            .Include(c => c.Lecturer) // Get lecturer details
-            .Include(c => c.Subject)  // Get subject details
+        var claims = await _context.Claims
+            .Include(c => c.Lecturer)
+            .Include(c => c.Subject)
+            .OrderByDescending(c => c.SubmissionDate)
             .Select(c => new AdminClaimViewModel
             {
                 ClaimId = c.ClaimId,
@@ -29,21 +30,34 @@ public class AdminController : Controller
                 Status = c.Status,
                 HoursWorked = c.HoursWorked,
                 ClaimValue = c.ClaimValue,
-                SubmittedAgo = "X days ago" // This can be calculated
+                SubmittedAgo = (DateTime.Now - c.SubmissionDate).Days + " days ago"
             }).ToListAsync();
 
-        return View(pendingClaims);
+        return View(claims);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ApproveClaim(int claimId)
     {
-        var claim = await _context.Claims.FindAsync(claimId);
-        if (claim != null)
+        try
         {
-            claim.Status = "Approved";
-            await _context.SaveChangesAsync();
+            var claim = await _context.Claims.FindAsync(claimId);
+            if (claim != null)
+            {
+                claim.Status = "Approved";
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Claim ID {claimId} has been approved successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = $"Error: Claim ID {claimId} could not be found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the exception 'ex'
+            TempData["ErrorMessage"] = $"Failed to approve claim {claimId}. An error occurred.";
         }
         return RedirectToAction(nameof(Dashboard));
     }
@@ -52,11 +66,24 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RejectClaim(int claimId)
     {
-        var claim = await _context.Claims.FindAsync(claimId);
-        if (claim != null)
+        try
         {
-            claim.Status = "Rejected";
-            await _context.SaveChangesAsync();
+            var claim = await _context.Claims.FindAsync(claimId);
+            if (claim != null)
+            {
+                claim.Status = "Rejected";
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Claim ID {claimId} has been rejected successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = $"Error: Claim ID {claimId} could not be found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the exception 'ex'
+            TempData["ErrorMessage"] = $"Failed to reject claim {claimId}. An error occurred.";
         }
         return RedirectToAction(nameof(Dashboard));
     }

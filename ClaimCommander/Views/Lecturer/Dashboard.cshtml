@@ -3,6 +3,20 @@
     ViewData["Title"] = "Lecturer Dashboard";
 }
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 <div class="mb-4">
     <h2 class="display-6 fw-bold">Lecturer Dashboard</h2>
     <p class="text-secondary">Manage your teaching claims</p>
@@ -11,26 +25,28 @@
 <div class="card shadow-sm mb-4">
     <div class="card-body p-4">
         <h4 class="card-title fw-semibold">Submit New Claim</h4>
-
         <form asp-action="SubmitClaim" method="post" enctype="multipart/form-data" class="mt-3">
             @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="mb-3">
                 <label asp-for="NewClaimForm.SelectedSubjectId" class="form-label">Subject</label>
                 <select asp-for="NewClaimForm.SelectedSubjectId" asp-items="Model.NewClaimForm.Subjects" class="form-select">
-                    <option disabled selected>Select assigned subject</option>
+                    <option disabled selected value="">Select assigned subject</option>
                 </select>
+                <span asp-validation-for="NewClaimForm.SelectedSubjectId" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="NewClaimForm.HoursWorked" class="form-label">Teaching Hours</label>
                 <input asp-for="NewClaimForm.HoursWorked" class="form-control" placeholder="Enter hours taught">
+                <span asp-validation-for="NewClaimForm.HoursWorked" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label for="documentFile" class="form-label">Supporting Document</label>
                 <input name="documentFile" type="file" class="form-control" id="documentFile" />
-                <small class="form-text text-secondary">Upload PDF, DOCX, or XLSX files.</small>
+                <small class="form-text text-secondary">Optional. Upload PDF, DOCX, or XLSX files.</small>
             </div>
 
             <div class="d-grid mt-4">
@@ -51,18 +67,22 @@
             var statusClass = claim.Status == "Approved" ? "success" : claim.Status == "Pending" ? "warning" : "primary";
             var statusIcon = claim.Status == "Approved" ? "bi-check-circle-fill" : claim.Status == "Pending" ? "bi-clock-history" : "bi-arrow-repeat";
 
-            <div class="d-flex align-items-start p-3 border rounded-3 mb-3" style="border-color: #30363d !important;">
-                <div class="bg-@statusClass rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px; opacity: 0.7;">
-                    <i class="bi @statusIcon text-white fs-5"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between">
-                        <span class="fw-semibold">@claim.Subject.Name</span>
-                        <small class="text-secondary">@claim.SubmissionDate.ToString("MMM d, yyyy")</small>
-                    </div>
-                    <small class="text-secondary">@claim.HoursWorked hours claimed</small>
-                    <div class="mt-1 d-flex align-items-center">
-                        <span class="badge rounded-pill status-badge">@claim.Status</span>
+            <div class="card claim-card shadow-sm mb-3 border-2 border-@statusClass">
+                <div class="card-body">
+                    <div class="d-flex align-items-start">
+                        <div class="claim-card-icon bg-@statusClass">
+                            <i class="bi @statusIcon fs-4"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <div class="d-flex justify-content-between">
+                                <p class="fw-semibold mb-0">@claim.Subject.Name</p>
+                                <span class="badge rounded-pill bg-@statusClass bg-opacity-10 text-@statusClass border border-@statusClass border-opacity-10 fs-6 align-self-start">@claim.Status.ToUpper()</span>
+                            </div>
+                            <div class="row g-3 mt-2">
+                                <div class="col-auto"><small>@claim.HoursWorked hours claimed</small></div>
+                                <div class="col-auto"><small>Submitted @claim.SubmissionDate.ToString("MMM d, yyyy")</small></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
