@@ -8,6 +8,23 @@ using System.Linq;
 
 namespace ClaimCommander.Controllers
 {
+    /// <summary>
+    /// Controller for lecturer claims: submitting new claims and viewing existing ones.
+    /// <para>
+    /// References:
+    /// <list type="bullet">
+    /// <item>
+    /// StackOverflow. (2015) ‘How to show success message in view when RedirectToAction used’. Stack Overflow. Available at: https://stackoverflow.com/questions/27886084/how-to-show-success-message-in-view-when-redirecttoaction-used (Accessed: 21 October 2025).  
+    /// </item>
+    /// <item>
+    /// StackOverflow. (2016) ‘Dropdown list from Dictionary MVC – ASP.NET’. Stack Overflow. Available at: https://stackoverflow.com/questions/34707152/dropdown-list-from-dictionary-mvc (Accessed: 21 October 2025).  
+    /// </item>
+    /// <item>
+    /// Microsoft. (2024) ‘Upload files in ASP.NET Core’. Microsoft Docs. Available at: https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-9.0 (Accessed: 21 October 2025).  
+    /// </item>
+    /// </list>
+    /// </para>
+    /// </summary>
     public class LecturerController : Controller
     {
         private readonly IClaimStorageService _claimStorage;
@@ -56,7 +73,7 @@ namespace ClaimCommander.Controllers
             var newClaim = new Claim
             {
                 LecturerName = model.LecturerName,
-                HoursWorked = (decimal)model.HoursWorked, // Cast to decimal to match Claim model
+                HoursWorked = (decimal)model.HoursWorked,
                 HourlyRate = rate,
                 SubmissionDate = DateTime.UtcNow,
                 Status = "Pending",
@@ -81,11 +98,14 @@ namespace ClaimCommander.Controllers
             }
 
             _claimStorage.AddClaim(newClaim);
-            TempData["SuccessMessage"] = "Your claim has been submitted successfully!";
+
+            TempData["SuccessMessage"] = "Your claim has been submitted successfully!";  // Using TempData to carry a message after redirect (StackOverflow 2015)
             return RedirectToAction("ViewClaims");
         }
 
-        // --- THIS IS THE UPDATED METHOD ---
+        /// <summary>
+        /// Displays the lecturer dashboard with all claims and summary data.
+        /// </summary>
         public IActionResult ViewClaims()
         {
             var allClaims = _claimStorage.GetAllClaims();
@@ -93,7 +113,6 @@ namespace ClaimCommander.Controllers
             var viewModel = new LecturerDashboardViewModel
             {
                 AllClaims = allClaims,
-                // Calculate and add summary data
                 TotalHoursClaimed = allClaims.Sum(c => c.HoursWorked),
                 TotalAmountClaimed = allClaims.Sum(c => c.ClaimValue),
                 PendingClaimsCount = allClaims.Count(c => c.Status == "Pending" || c.Status == "CoordinatorApproved")

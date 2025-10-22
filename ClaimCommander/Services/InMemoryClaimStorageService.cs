@@ -5,6 +5,23 @@ using System.Linq;
 
 namespace ClaimCommander.Services
 {
+    /// <summary>
+    /// A simple in-memory implementation of IClaimStorageService that stores claims in a Dictionary and uses locking for thread-safety.
+    /// <para>
+    /// References:
+    /// <list type="bullet">
+    /// <item>
+    /// StackOverflow (2011) ‘Thread-safe Dictionary.Add’, <em>Stack Overflow</em>, available at: https://stackoverflow.com/questions/5506325/thread-safe-dictionary-add (Accessed: 21 October 2025).
+    /// </item>
+    /// <item>
+    /// StackOverflow (2022) ‘How to understand this threading issue with a dictionary’, <em>Stack Overflow</em>, available at: https://stackoverflow.com/questions/74800761/how-to-understand-this-threading-issue-with-a-dictionary (Accessed: 21 October 2025).
+    /// </item>
+    /// <item>
+    /// Microsoft Docs (2025) ‘ConcurrentDictionary<TKey,TValue> Class’, <em>Microsoft Docs</em>, available at: https://learn.microsoft.com/en-us/dotnet/api/system.collections.concurrent.concurrentdictionary-2 (Accessed: 21 October 2025).
+    /// </item>
+    /// </list>
+    /// </para>
+    /// </summary>
     public class InMemoryClaimStorageService : IClaimStorageService
     {
         private readonly Dictionary<int, Claim> _claims = new();
@@ -61,13 +78,19 @@ namespace ClaimCommander.Services
             });
         }
 
+        /// <summary>
+        /// Adds a claim. Locks around the Dictionary to ensure thread-safe access.
+        /// <para>
+        /// Because a plain Dictionary<TKey,TValue> is not thread-safe, explicit locking is necessary (StackOverflow 2011; StackOverflow 2022).
+        /// </para>
+        /// </summary>
         public int AddClaim(Claim claim)
         {
             lock (_lock)
             {
                 claim.ClaimId = _nextId++;
                 // Calculate total amount before storing
-                claim.TotalAmount = (decimal)claim.HoursWorked * claim.HourlyRate;
+                claim.TotalAmount = claim.HoursWorked * claim.HourlyRate;
                 _claims[claim.ClaimId] = claim;
                 return claim.ClaimId;
             }
@@ -85,7 +108,9 @@ namespace ClaimCommander.Services
         {
             lock (_lock)
             {
-                return _claims.Values.OrderByDescending(c => c.SubmissionDate).ToList();
+                return _claims.Values
+                              .OrderByDescending(c => c.SubmissionDate)
+                              .ToList();
             }
         }
 
@@ -94,9 +119,9 @@ namespace ClaimCommander.Services
             lock (_lock)
             {
                 return _claims.Values
-                    .Where(c => c.Status == status)
-                    .OrderByDescending(c => c.SubmissionDate)
-                    .ToList();
+                              .Where(c => c.Status == status)
+                              .OrderByDescending(c => c.SubmissionDate)
+                              .ToList();
             }
         }
 
