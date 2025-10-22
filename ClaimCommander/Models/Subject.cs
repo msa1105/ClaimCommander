@@ -1,6 +1,4 @@
-﻿// In Models/Subject.cs
-
-public class Subject
+﻿public class Subject
 {
     public int SubjectId { get; set; }
     public string Name { get; set; } // This was missing

@@ -23,6 +23,8 @@ namespace ClaimCommander.Models
 
         public decimal ClaimValue => HoursWorked * HourlyRate;
 
+        public decimal TotalAmount { get; set; }
+
         public DateTime SubmissionDate { get; set; } = DateTime.Now;
 
         // Status: Pending, CoordinatorApproved, ManagerApproved, Rejected

@@ -33,7 +33,7 @@ main {
 /* --- 2. Base Dark Theme --- */
 .dark-theme {
     background-color: #0d1117;
-    color: #8b949e;
+    color: #ffffff;
 }
 
     .dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4, .dark-theme h5,
@@ -121,13 +121,13 @@ main {
         }
 
     .dark-theme .btn-outline-warning {
-        color: #e3b341;
-        border-color: #e3b341;
+        color: #b07c00; /* Changed */
+        border-color: #b07c00; /* Changed */
     }
 
         .dark-theme .btn-outline-warning:hover {
-            color: #0d1117;
-            background-color: #e3b341;
+            color: #fff;
+            background-color: #b07c00; /* Changed */
         }
 
     .dark-theme .btn-outline-success {
@@ -139,6 +139,11 @@ main {
             color: #fff;
             background-color: #3fb950;
         }
+
+    /* Progress Bar for Pending Status */
+    .dark-theme .progress-bar.bg-warning {
+        background-color: #b07c00 !important;
+    }
 
     /* Badge Styles */
     .dark-theme .badge {
@@ -178,7 +183,7 @@ main {
         color: white;
     }
 
-/* Admin Dashboard - Status Item Icons */
+/* Dashboard - Status Item Icons */
 .status-item-card-icon {
     width: 48px;
     height: 48px;
@@ -190,8 +195,8 @@ main {
 }
 
 .dark-theme .status-item-card-icon.bg-warning {
-    background-color: rgba(227, 179, 65, 0.15);
-    color: #e3b341;
+    background-color: rgba(176, 124, 0, 0.15); /* Changed */
+    color: #b07c00; /* Changed */
 }
 
 .dark-theme .status-item-card-icon.bg-success {
@@ -225,7 +230,7 @@ main {
 }
 
 .claim-card.border-warning {
-    border-left-color: #e3b341 !important;
+    border-left-color: #b07c00 !important; /* Changed */
 }
 
 .claim-card.border-success {
@@ -241,8 +246,8 @@ main {
 }
 
 .dark-theme .claim-card-icon.bg-warning {
-    background-color: rgba(227, 179, 65, 0.15);
-    color: #e3b341;
+    background-color: rgba(176, 124, 0, 0.15); /* Changed */
+    color: #b07c00; /* Changed */
 }
 
 .dark-theme .claim-card-icon.bg-success {

@@ -1,4 +1,4 @@
-﻿@model List<ClaimCommander.Models.Claim>
+﻿@model ClaimCommander.Models.LecturerDashboardViewModel
 @{
     ViewData["Title"] = "My Claims";
 }
@@ -13,132 +13,103 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="display-6 fw-bold">My Claims</h2>
-        <p class="text-secondary">Track the status of your submitted claims</p>
+        <h2 class="display-6 fw-bold">My Submitted Claims</h2>
+        <p class="text-secondary">A record of all the claims you have submitted.</p>
     </div>
-    <a asp-action="SubmitClaim" class="btn btn-primary">Submit New Claim</a>
+    <a asp-action="SubmitClaim" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Submit New Claim
+    </a>
 </div>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-        <i class="bi bi-info-circle"></i> You haven't submitted any claims yet.
-    </div>
-}
-else
-{
-    @foreach (var claim in Model)
+<div>
+    @if (Model.AllClaims != null && Model.AllClaims.Any())
     {
-        var statusClass = claim.Status switch
+        foreach (var claim in Model.AllClaims)
         {
-            "Pending" => "warning",
-            "CoordinatorApproved" => "info",
-            "ManagerApproved" => "success",
-            "Rejected" => "danger",
-            _ => "secondary"
-        };
+            var progressWidth = "0%";
+            var progressBarBg = "bg-secondary";
+            var progressText = claim.Status;
 
-        var statusIcon = claim.Status switch
-        {
-            "Pending" => "bi-clock-history",
-            "CoordinatorApproved" => "bi-arrow-right-circle-fill",
-            "ManagerApproved" => "bi-check-circle-fill",
-            "Rejected" => "bi-x-circle-fill",
-            _ => "bi-question-circle"
-        };
+            switch (claim.Status)
+            {
+                case "Pending":
+                    progressWidth = "33%";
+                    progressBarBg = "bg-warning";
+                    break;
+                case "CoordinatorApproved":
+                    progressWidth = "66%";
+                    progressBarBg = "bg-info";
+                    progressText = "Approved (Coordinator)";
+                    break;
+                case "ManagerApproved":
+                case "Approved":
+                    progressWidth = "100%";
+                    progressBarBg = "bg-success";
+                    progressText = "Approved";
+                    break;
+                case "Rejected":
+                    progressWidth = "100%";
+                    progressBarBg = "bg-danger";
+                    break;
+            }
 
-        var statusText = claim.Status switch
-        {
-            "CoordinatorApproved" => "Verified - Awaiting Manager Approval",
-            "ManagerApproved" => "Fully Approved",
-            _ => claim.Status
-        };
-
-        <div class="card claim-card shadow-sm mb-3 border-2 border-@statusClass">
-            <div class="card-body">
-                <div class="d-flex align-items-start">
-                    <div class="claim-card-icon bg-@statusClass">
-                        <i class="bi @statusIcon fs-4"></i>
+            <div class="card claim-card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <p class="mb-0 fw-semibold text-light">Submitted on @claim.SubmissionDate.ToString("dd MMM yyyy")</p>
+                                <p class="mb-0 fw-bold text-light">@claim.ClaimValue.ToString("C", new System.Globalization.CultureInfo("en-ZA"))</p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <p class="mb-0 text-secondary">Ref: #@claim.ClaimId.ToString("D4")</p>
+                            </div>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-secondary ms-4 flex-shrink-0">View Details</a>
                     </div>
-                    <div class="flex-grow-1 ms-3">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1">Claim #@claim.ClaimId</h5>
-                                <p class="mb-0 text-secondary">@claim.LecturerName</p>
-                            </div>
-                            <span class="badge bg-@statusClass">@statusText.ToUpper()</span>
-                        </div>
-
-                        <div class="row g-3 mt-2">
-                            <div class="col-auto">
-                                <small><strong>Hours:</strong> @claim.HoursWorked</small>
-                            </div>
-                            <div class="col-auto">
-                                <small><strong>Rate:</strong> @claim.HourlyRate.ToString("C", new System.Globalization.CultureInfo("en-ZA"))</small>
-                            </div>
-                            <div class="col-auto">
-                                <small><strong>Total:</strong> @claim.ClaimValue.ToString("C", new System.Globalization.CultureInfo("en-ZA"))</small>
-                            </div>
-                            <div class="col-auto">
-                                <small><strong>Submitted:</strong> @claim.SubmissionDate.ToString("MMM dd, yyyy")</small>
+                    <div class="mt-3">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar @progressBarBg" role="progressbar" style="width: @progressWidth" aria-valuenow="@progressWidth.Replace("%","")" aria-valuemin="0" aria-valuemax="100">
+                                <strong>@progressText</strong>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        }
 
-                        @if (!string.IsNullOrEmpty(claim.Notes))
-                        {
-                            <div class="mt-2">
-                                <small><strong>Notes:</strong> @claim.Notes</small>
-                            </div>
-                        }
-
-                        @if (claim.Documents.Any())
-                        {
-                            <div class="mt-3">
-                                <small class="text-secondary">Supporting Documents:</small>
-                                @for (int i = 0; i < claim.Documents.Count; i++)
-                                {
-                                    var doc = claim.Documents[i];
-                                    <div class="mt-1">
-                                        <a asp-action="DownloadDocument" asp-route-claimId="@claim.ClaimId" asp-route-documentIndex="@i" class="btn btn-sm btn-outline-secondary">
-                                            <i class="bi bi-download"></i> @doc.FileName
-                                        </a>
-                                        <small class="text-secondary">(@(doc.FileSize / 1024) KB)</small>
-                                    </div>
-                                }
-                            </div>
-                        }
-
-                        @if (claim.Status == "Rejected" && !string.IsNullOrEmpty(claim.RejectionReason))
-                        {
-                            <div class="alert alert-danger mt-3 mb-0">
-                                <strong>Rejection Reason:</strong> @claim.RejectionReason
-                            </div>
-                        }
-
-                        @if (claim.Status == "Pending")
-                        {
-                            <div class="progress mt-3" style="height: 8px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 33%"></div>
-                            </div>
-                            <small class="text-secondary">Status: Pending Programme Coordinator Review</small>
-                        }
-                        else if (claim.Status == "CoordinatorApproved")
-                        {
-                            <div class="progress mt-3" style="height: 8px;">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: 66%"></div>
-                            </div>
-                            <small class="text-secondary">Status: Verified by Coordinator, Awaiting Manager Approval</small>
-                        }
-                        else if (claim.Status == "ManagerApproved")
-                        {
-                            <div class="progress mt-3" style="height: 8px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
-                            </div>
-                            <small class="text-secondary">Status: Fully Approved by Academic Manager</small>
-                        }
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-secondary">Total Hours Claimed</h5>
+                        <p class="card-text display-5 fw-bold">@Model.TotalHoursClaimed</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-secondary">Total Amount Claimed</h5>
+                        <p class="card-text display-5 fw-bold">@Model.TotalAmountClaimed.ToString("C0", new System.Globalization.CultureInfo("en-ZA"))</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-secondary">Pending Claims</h5>
+                        <p class="card-text display-5 fw-bold">@Model.PendingClaimsCount</p>
                     </div>
                 </div>
             </div>
         </div>
     }
-}
+    else
+    {
+        <div class="text-center card shadow-sm p-5">
+            <h4>No Claims Found</h4>
+            <p class="text-secondary mb-0">You have not submitted any claims yet.</p>
+        </div>
+    }
+</div>

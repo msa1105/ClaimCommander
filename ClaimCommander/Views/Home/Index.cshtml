@@ -3,6 +3,12 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Welcome to the ClaimCommander beta</h1>
+    <p>Please select an option.</p>
+
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <a class="btn btn-primary" href="@Url.Action("SubmitClaim", "Lecturer")">Lecturer Claims</a>
+        <a class="btn btn-secondary" href="@Url.Action("Dashboard", "Manager")">Academic Manager Dashboard</a>
+        <a class="btn btn-info" href="@Url.Action("Dashboard", "Coordinator")">Programme Coordinator Dashboard</a>
+    </div>
 </div>

@@ -1,19 +1,18 @@
 ﻿using System.Collections.Generic;
-using ClaimCommander.Models;
 
-/// <summary>
-/// A comprehensive model for the entire lecturer dashboard view (lecturerpage.txt).
-/// </summary>
-public class LecturerDashboardViewModel
+namespace ClaimCommander.Models
 {
-    // For the "Claim Status" list
-    public List<Claim> RecentClaims { get; set; }
+    public class LecturerDashboardViewModel
+    {
+        // Renamed from RecentClaims to avoid confusion, holds all claims for the view
+        public List<Claim> AllClaims { get; set; } = new List<Claim>();
 
-    // For the "Monthly Summary" card
-    public decimal TotalHoursMonth { get; set; }
-    public int PendingClaimsCount { get; set; }
-    public decimal ApprovedValueMonth { get; set; }
+        // --- Summary Properties ---
+        public decimal TotalHoursClaimed { get; set; }
+        public decimal TotalAmountClaimed { get; set; }
+        public int PendingClaimsCount { get; set; }
 
-    // For the "Submit New Claim" form
-    public NewClaimViewModel NewClaimForm { get; set; }
+        // This can be used for the submission form if it's on the same page
+        public NewClaimViewModel? NewClaimForm { get; set; }
+    }
 }
