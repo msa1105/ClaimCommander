@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ClaimCommander.Models;
 
 /// <summary>
 /// A comprehensive model for the entire lecturer dashboard view (lecturerpage.txt).

@@ -1,46 +1,75 @@
-﻿using ClaimCommander.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
+using ClaimCommander.Data;
+using ClaimCommander.Models;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
-/// <summary>
-/// Controller for the lecturer's views and actions from lecturerpage.txt.
-/// </summary>
 public class LecturerController : Controller
 {
-    /// <summary>
-    /// Displays the main dashboard for the lecturer.
-    /// </summary>
-    public IActionResult Dashboard()
+    private readonly ApplicationDbContext _context;
+
+    public LecturerController(ApplicationDbContext context)
     {
-        // --- Create Mock Data for the View ---
+        _context = context;
+    }
 
-        // 1. Mock list of recent claims for the "Claim Status" section
-        var mockClaims = new List<Claim>
-        {
-            new Claim { Subject = new Subject{ Name = "Advanced Mathematics - Week 12" }, SubmissionDate = DateTime.Now.AddDays(-2), HoursWorked = 24, Status = "Pending" },
-            new Claim { Subject = new Subject{ Name = "Database Management - Week 11" }, SubmissionDate = DateTime.Now.AddDays(-8), HoursWorked = 18, Status = "Processing" },
-            new Claim { Subject = new Subject{ Name = "Computer Science - Week 10" }, SubmissionDate = DateTime.Now.AddDays(-15), HoursWorked = 20, Status = "Approved" }
-        };
-
-        // 2. Mock list of subjects for the "New Claim" form dropdown
-        var mockSubjects = new List<SelectListItem>
-        {
-            new SelectListItem { Value = "1", Text = "Advanced Mathematics" },
-            new SelectListItem { Value = "2", Text = "Computer Science Fundamentals" },
-            new SelectListItem { Value = "3", Text = "Database Management Systems" }
-        };
-
-        // 3. Assemble the main ViewModel
+    // GET: Displays the dashboard
+    public async Task<IActionResult> Dashboard()
+    {
         var viewModel = new LecturerDashboardViewModel
         {
-            RecentClaims = mockClaims,
+            // Fetch real claims from the database for the current user (mocked for now)
+            RecentClaims = await _context.Claims
+                                .Include(c => c.Subject) // Include subject details
+                                .OrderByDescending(c => c.SubmissionDate)
+                                .ToListAsync(),
+
+            // Monthly Summary (can be calculated later)
             TotalHoursMonth = 62,
             PendingClaimsCount = 3,
-            ApprovedValueMonth = 12400.00m,
-            NewClaimForm = new NewClaimViewModel { Subjects = mockSubjects }
+            ApprovedValueMonth = 12400,
+
+            // Populate the dropdown for the form
+            NewClaimForm = new NewClaimViewModel
+            {
+                Subjects = new SelectList(_context.Subjects, "SubjectId", "Name")
+            }
         };
 
         return View(viewModel);
+    }
+
+    // POST: Handles the form submission
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SubmitClaim(NewClaimViewModel newClaim)
+    {
+        if (ModelState.IsValid)
+        {
+            // For now, we will mock the lecturer's details
+            var lecturer = _context.Users.FirstOrDefault(u => u.Role == "Lecturer"); // Find a mock lecturer
+            var subject = _context.Subjects.Find(newClaim.SelectedSubjectId);
+
+            var claim = new Claim
+            {
+                LecturerId = lecturer.UserId,
+                SubjectId = newClaim.SelectedSubjectId,
+                HoursWorked = (decimal)newClaim.HoursWorked,
+                SubmissionDate = DateTime.Now,
+                Status = "Pending",
+                ClaimValue = (decimal)newClaim.HoursWorked * lecturer.HourlyRate // Calculate value
+            };
+
+            _context.Add(claim);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        // If model is not valid, return to the dashboard to show errors
+        // You'll need to re-populate the ViewModel here, but for now we'll keep it simple
+        return RedirectToAction(nameof(Dashboard));
     }
 }

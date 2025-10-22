@@ -1,4 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using ClaimCommander.Models;
+using ClaimCommander.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString)); // Or UseSqlite, UseNpgsql, etc.
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
