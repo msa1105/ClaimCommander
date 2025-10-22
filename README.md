@@ -7,6 +7,8 @@
 
 **A functional web-based prototype of a Contract Monthly Claim System for academic institutions.**
 
+WATCH HERE: https://youtu.be/ehGcOK5s4Go - YOUTUBE VIDEO LINK
+
 
 ## 🎯 Overview
 
@@ -35,7 +37,7 @@ Built using **ASP.NET Core MVC** with a clear separation of concerns:
   - **Models**: Defines the data entities (User, Claim, DocumentInfo) and ViewModels.
   - **Views**: Razor pages (`.cshtml`) for the user interface.
   - **Controllers**: Handle user input, business logic, and data flow.
-  - **In-Memory Service**: A service (`InClaimStorageService`) acts as a temporary data store, simulating backend functionality with mock data.
+  - **In-Memory Service**: A service (`InMemoryClaimStorageService`) acts as a temporary data store, simulating backend functionality with mock data.
 
 ## 📊 Database Design
 
