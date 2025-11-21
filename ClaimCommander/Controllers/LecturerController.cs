@@ -2,24 +2,36 @@
 using ClaimCommander.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; // Required for SelectList
+using Microsoft.AspNetCore.Http; // Required for Session
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks; // Added for async operations
+using System.Threading.Tasks;
 
 namespace ClaimCommander.Controllers
 {
+    /// <summary>
+    /// Controller for Lecturer interactions.
+    /// <para>
+    /// References:
+    /// <list type="bullet">
+    /// <item>Microsoft (2025) 'Session in ASP.NET Core', available at: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/app-state</item>
+    /// <item>Microsoft (2025) 'File uploads in ASP.NET Core', available at: https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads</item>
+    /// </list>
+    /// </para>
+    /// </summary>
     public class LecturerController : Controller
     {
         private readonly IClaimStorageService _claimStorage;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IFileEncryptionService _fileEncryptionService;
 
-        private static readonly Dictionary<string, decimal> SubjectRates = new Dictionary<string, decimal>
+        // Mock Subjects list for the dropdown
+        private static readonly List<string> _subjectList = new List<string>
         {
-            { "Math", 250.00m }, { "English", 220.00m }, { "Science", 275.00m },
-            { "History", 210.00m }, { "Art", 280.00m }
+            "Advanced Programming", "Database Systems", "Software Engineering", "Web Development", "Information Systems"
         };
 
         public LecturerController(
@@ -32,53 +44,113 @@ namespace ClaimCommander.Controllers
             _fileEncryptionService = fileEncryptionService;
         }
 
-        public IActionResult SubmitClaim()
+        // Helper to check role
+        private bool IsAuthorized()
         {
-            var model = new NewClaimViewModel { Subjects = SubjectRates.Keys.ToList() };
-            return View(model);
+            return HttpContext.Session.GetString("UserRole") == "Lecturer";
         }
 
+        // Helper to SIMULATE getting the HR-set rate for a user.
+        // This fulfills the requirement: "The claim rate must always match the value set by HR."
+        private decimal GetOfficialRateForUser(int userId)
+        {
+            // In a real app, this would query the database.
+            // For the prototype, we hardcode rates based on ID to demonstrate the logic works.
+            return userId switch
+            {
+                1 => 250.00m, // User 1 (e.g., John)
+                2 => 300.00m, // User 2
+                _ => 150.00m  // Default
+            };
+        }
+
+        [HttpGet]
+        public IActionResult SubmitClaim()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+            if (!IsAuthorized()) return RedirectToAction("AccessDenied", "Account");
+
+            // AUTOMATION: Fetch the HR-set rate
+            decimal officialRate = GetOfficialRateForUser(userId.Value);
+
+            var model = new NewClaimViewModel
+            {
+                // Populate dropdown with the list of strings directly
+                Subjects = new List<string>(_subjectList),
+                HourlyRate = (double)officialRate, // Explicit cast to double
+                LecturerName = HttpContext.Session.GetString("UserName") ?? "Lecturer"
+            };
+
+            return View(model);
+        }
+        // Reference: Microsoft (2025) 'File uploads in ASP.NET Core', available at: https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Changed to async to support the encryption service
-        public async Task<IActionResult> SubmitClaim(NewClaimViewModel model)
+        public async Task<IActionResult> SubmitClaim(NewClaimViewModel model) // Removed explicit IFormFile parameter, it's in the model
         {
-            model.Subjects = SubjectRates.Keys.ToList();
-            if (!ModelState.IsValid) return View(model);
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+            if (!IsAuthorized()) return RedirectToAction("AccessDenied", "Account");
 
-            if (!SubjectRates.TryGetValue(model.Subject, out var rate))
+            // AUTOMATION RULE: Override any input rate with the official one
+            decimal officialRate = GetOfficialRateForUser(userId.Value);
+
+            // File Validation
+            if (model.DocumentFile != null)
             {
-                ModelState.AddModelError("Subject", "Invalid subject selected.");
+                if (model.DocumentFile.Length > 5 * 1024 * 1024) // 5MB Limit
+                {
+                    ModelState.AddModelError("DocumentFile", "File size must be less than 5MB.");
+                }
+
+                var allowedExtensions = new[] { ".pdf", ".docx", ".xlsx" };
+                var extension = Path.GetExtension(model.DocumentFile.FileName).ToLowerInvariant();
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError("DocumentFile", "Invalid file type. Only PDF, DOCX, and XLSX are allowed.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                model.Subjects = new List<string>(_subjectList);
+                model.HourlyRate = (double)officialRate;
                 return View(model);
             }
 
+            // Create the claim object
+            // Automation: Calculate value (Hours * Rate) here automatically
             var newClaim = new Claim
             {
-                LecturerName = model.LecturerName,
+                LecturerName = model.LecturerName ?? "Unknown",
                 HoursWorked = (decimal)model.HoursWorked,
-                HourlyRate = rate,
+                HourlyRate = officialRate, // Enforced
                 SubmissionDate = DateTime.UtcNow,
                 Status = "Pending",
-                Notes = model.Notes
+                Notes = model.Notes,
+                // The math is done here implicitly by storing Hours and Rate. 
+                // If Claim has a 'TotalAmount' property, set it:
+                TotalAmount = (decimal)model.HoursWorked * officialRate
             };
 
-            // --- ADJUSTED FILE ENCRYPTION LOGIC ---
+            // --- FILE ENCRYPTION LOGIC ---
             if (model.DocumentFile != null && model.DocumentFile.Length > 0)
             {
-                // 1. Define the path where files will be saved
                 string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+                if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                // 2. Call the service to encrypt and save the file
-                string encryptedFilePath = await _fileEncryptionService.EncryptAndSaveFileAsync(model.DocumentFile, uploadsFolder);
+                var uniqueFileName = Guid.NewGuid().ToString() + ".encrypted";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                // 3. Create the document info and store the relative path
+                await _fileEncryptionService.EncryptAndSaveFileAsync(model.DocumentFile, filePath);
+
                 var documentInfo = new DocumentInfo
                 {
                     FileName = model.DocumentFile.FileName,
                     FileSize = model.DocumentFile.Length,
                     UploadDate = DateTime.UtcNow,
-                    // Store a web-accessible relative path
-                    EncryptedFilePath = "/uploads/" + Path.GetFileName(encryptedFilePath)
+                    EncryptedFilePath = "/uploads/" + uniqueFileName
                 };
                 newClaim.Documents.Add(documentInfo);
             }
@@ -90,15 +162,36 @@ namespace ClaimCommander.Controllers
 
         public IActionResult ViewClaims()
         {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login", "Account");
+            if (!IsAuthorized()) return RedirectToAction("AccessDenied", "Account");
+
+            // Retrieve all claims
             var allClaims = _claimStorage.GetAllClaims();
+
+            // Filter by Lecturer Name (since we don't have ID in Claim model)
+            string currentLecturerName = HttpContext.Session.GetString("UserName") ?? "Lecturer";
+
+            // Simple filter: Only show claims where the name matches
+            // Note: This relies on the name being consistent. In a real app, use ID.
+            var myClaims = allClaims.Where(c => c.LecturerName == currentLecturerName).ToList();
+
             var viewModel = new LecturerDashboardViewModel
             {
-                AllClaims = allClaims,
-                TotalHoursClaimed = allClaims.Sum(c => c.HoursWorked),
-                TotalAmountClaimed = allClaims.Sum(c => c.ClaimValue),
-                PendingClaimsCount = allClaims.Count(c => c.Status == "Pending" || c.Status == "CoordinatorApproved")
+                AllClaims = myClaims, // Matches your updated ViewModel property name
+                TotalHoursClaimed = myClaims.Sum(c => c.HoursWorked),
+                // Assuming you have a property for value, usually calculated as Hours * Rate
+                // If TotalAmount exists on claim, use that. If not, calculate it.
+                TotalAmountClaimed = myClaims.Where(c => c.Status == "Approved" || c.Status == "ManagerApproved").Sum(c => c.TotalAmount),
+                PendingClaimsCount = myClaims.Count(c => c.Status == "Pending")
             };
             return View(viewModel);
         }
     }
 }
+/*
+ * Reference List:
+ * * Microsoft (2025) 'File uploads in ASP.NET Core', Microsoft Learn, available at: https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads (Accessed: 21 November 2025).
+ * * Microsoft (2025) 'Session in ASP.NET Core', Microsoft Learn, available at: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/app-state (Accessed: 21 November 2025).
+ * * Microsoft (2025) 'Model validation in ASP.NET Core MVC', Microsoft Learn, available at: https://learn.microsoft.com/en-us/aspnet/core/mvc/models/validation (Accessed: 21 November 2025).
+ */

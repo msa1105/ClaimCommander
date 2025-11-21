@@ -1,3 +1,5 @@
+using ClaimCommander.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
@@ -16,6 +18,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddSingleton<ClaimCommander.Services.IClaimStorageService, ClaimCommander.Services.InMemoryClaimStorageService>();
 builder.Services.AddSingleton<ClaimCommander.Services.IFileEncryptionService, ClaimCommander.Services.FileEncryptionService>();
 builder.Services.AddSingleton<ClaimCommander.Services.ILecturerService, ClaimCommander.Services.InMemoryLecturerService>();
+builder.Services.AddSingleton<ClaimCommander.Services.IUserService, ClaimCommander.Services.InMemoryUserService>();
 
 var app = builder.Build();
 
@@ -34,6 +37,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.Run();

@@ -11,13 +11,14 @@ namespace ClaimCommander.Models
         public string LecturerName { get; set; }
 
         [Required(ErrorMessage = "Please select a subject.")]
-        public string Subject { get; set; }
+        [Display(Name = "Subject")]
+        public string Subject { get; set; } // Changed from int SelectedSubjectId if you store string name
 
         [Required(ErrorMessage = "Please enter the hours worked.")]
         [Range(0.1, 100, ErrorMessage = "Hours worked must be between 0.1 and 100.")]
         [Display(Name = "Hours Worked")]
         public double HoursWorked { get; set; }
-
+        public double HourlyRate { get; set; } // Display only, not user-editable
         public string Notes { get; set; }
 
         // This property will hold the uploaded file

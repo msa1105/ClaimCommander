@@ -7,7 +7,7 @@ TABLE OF CONTENTS
     - Cards
     - Forms
     - Buttons
-    - Alerts (NEW)
+    - Alerts
 4.  Page-Specific Styles
     - Login Page
     - Dashboards (Claim Cards)
@@ -96,24 +96,47 @@ a {
     color: #8b949e !important; /* Muted header text for hierarchy */
 }
 
-/* Tables */
+/* Tables - Updated for Dark Grey Background */
 .table {
     color: #f0f6fc !important;
-    background-color: transparent !important;
+    background-color: #21262d !important; /* Dark Grey Background applied ALWAYS */
+    --bs-table-bg: #21262d !important; /* Override Bootstrap variable */
+    border-radius: 6px;
+    overflow: hidden;
 }
 
     .table thead th {
-        background-color: #161b22;
+        background-color: #161b22 !important; /* Even darker header */
         border-bottom: 2px solid #30363d;
         color: #8b949e !important;
         text-transform: uppercase;
         font-size: 0.8rem;
     }
 
+    .table tbody td {
+        background-color: #21262d !important; /* Force cells to be dark grey */
+        color: #f0f6fc !important;
+    }
+
 .table-hover > tbody > tr:hover > * {
-    background-color: #21262d; /* Highlight row on hover */
-    color: #f0f6fc;
+    background-color: #30363d !important; /* Lighter grey on hover */
+    color: #f0f6fc !important;
+    --bs-table-accent-bg: #30363d !important; /* Override accent bg */
 }
+
+/* Ensure striped rows have distinct dark grey colors */
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: #21262d !important; /* Base Dark Grey */
+    color: #f0f6fc !important;
+    --bs-table-accent-bg: #21262d !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(even) > * {
+    background-color: #1c2128 !important; /* Slightly Darker Grey */
+    color: #f0f6fc !important;
+    --bs-table-accent-bg: #1c2128 !important;
+}
+
 
 /* Forms */
 .form-control, .form-select, textarea {
@@ -198,7 +221,7 @@ label {
         color: #0d1117 !important;
     }
 
-/* --- ALERTS (NEW FIX) --- */
+/* --- ALERTS --- */
 /* Override Bootstrap alert colors to match theme */
 
 .alert-success {

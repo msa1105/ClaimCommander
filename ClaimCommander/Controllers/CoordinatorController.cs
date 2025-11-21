@@ -22,7 +22,7 @@ namespace ClaimCommander.Controllers
             _encryption = encryption;
             _webHostEnvironment = webHostEnvironment; // Assign service
         }
-
+        // Reference: Microsoft (2025) 'Views in ASP.NET Core MVC', available at: https://learn.microsoft.com/en-us/aspnet/core/mvc/views/overview
         [HttpGet]
         public IActionResult Dashboard()
         {
@@ -125,3 +125,8 @@ namespace ClaimCommander.Controllers
         }
     }
 }
+/*
+ * Reference List:
+ * * Microsoft (2025) 'Views in ASP.NET Core MVC', Microsoft Learn, available at: https://learn.microsoft.com/en-us/aspnet/core/mvc/views/overview (Accessed: 21 November 2025).
+ * * Microsoft (2025) 'Dependency injection in ASP.NET Core', Microsoft Learn, available at: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection (Accessed: 21 November 2025).
+ */
