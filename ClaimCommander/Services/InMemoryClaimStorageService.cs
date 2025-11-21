@@ -105,7 +105,7 @@ namespace ClaimCommander.Services
         }
 
         public List<Claim> GetAllClaims()
-        {
+        { 
             lock (_lock)
             {
                 return _claims.Values

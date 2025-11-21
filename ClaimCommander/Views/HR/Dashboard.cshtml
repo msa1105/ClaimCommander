@@ -1,0 +1,82 @@
+﻿@model ClaimCommander.Models.HRDashboardViewModel
+
+@{
+    ViewData["Title"] = "HR Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">HR Dashboard</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Total Payable</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.TotalPayable.ToString("C")</h5>
+                    <p class="card-text">Total value of approved claims ready for payment.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">Claims to Process</div>
+                <div class="card-body">
+                    <h5 class="card-title">@Model.ClaimCount</h5>
+                    <p class="card-text">Claims approved by managers.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light mb-3">
+                <div class="card-header">Actions</div>
+                <div class="card-body">
+                    <a asp-action="ManageLecturers" class="btn btn-primary btn-sm mb-1">Manage Lecturers</a>
+                    <a asp-action="GeneratePaymentReport" class="btn btn-outline-dark btn-sm mb-1">Payment Report</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header">
+            Approved Claims Ready for Payment
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Lecturer</th>
+                        <th>Hours</th>
+                        <th>Rate</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var claim in Model.ApprovedClaims)
+                    {
+                        <tr>
+                            <td>#@claim.ClaimId</td>
+                            <td>@claim.LecturerName</td>
+                            <td>@claim.HoursWorked</td>
+                            <td>@claim.HourlyRate.ToString("C")</td>
+                            <td>@claim.ClaimValue.ToString("C")</td>
+                            <td>
+                                <a asp-action="GenerateInvoice" asp-route-claimId="@claim.ClaimId" class="btn btn-sm btn-outline-primary">Invoice</a>
+                                <form asp-action="MarkAsPaid" method="post" class="d-inline">
+                                    <input type="hidden" name="claimId" value="@claim.ClaimId" />
+                                    <button type="submit" class="btn btn-sm btn-success">Mark Paid</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (!Model.ApprovedClaims.Any())
+            {
+                <div class="alert alert-info mt-3">No claims are currently waiting for payment.</div>
+            }
+        </div>
+    </div>
+</div>

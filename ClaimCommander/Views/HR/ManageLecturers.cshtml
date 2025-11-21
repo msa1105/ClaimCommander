@@ -1,0 +1,36 @@
+﻿@model IEnumerable<ClaimCommander.Models.LecturerInfo>
+
+@{
+    ViewData["Title"] = "Manage Lecturers";
+}
+
+<div class="container mt-4">
+    <h2>Manage Lecturers</h2>
+    <a asp-action="Dashboard" class="btn btn-secondary mb-3">Back to Dashboard</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Hourly Rate</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var lecturer in Model)
+            {
+                <tr>
+                    <td>@lecturer.Name</td>
+                    <td>@lecturer.Email</td>
+                    <td>@lecturer.Department</td>
+                    <td>@lecturer.HourlyRate.ToString("C")</td>
+                    <td>
+                        <a asp-action="EditLecturer" asp-route-id="@lecturer.Id" class="btn btn-sm btn-primary">Edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

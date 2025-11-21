@@ -12,9 +12,10 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Register in-memory storage service
+// Register in-memory storage services
 builder.Services.AddSingleton<ClaimCommander.Services.IClaimStorageService, ClaimCommander.Services.InMemoryClaimStorageService>();
 builder.Services.AddSingleton<ClaimCommander.Services.IFileEncryptionService, ClaimCommander.Services.FileEncryptionService>();
+builder.Services.AddSingleton<ClaimCommander.Services.ILecturerService, ClaimCommander.Services.InMemoryLecturerService>();
 
 var app = builder.Build();
 
