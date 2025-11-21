@@ -3,12 +3,21 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome to the ClaimCommander beta</h1>
-    <p>Please select an option.</p>
+    <h1 class="display-4 fw-bold mb-4">Welcome to the ClaimCommander beta</h1>
+    <p class="lead mb-5">Please select an option.</p>
 
-    <div class="d-grid gap-2 col-6 mx-auto">
-        <a class="btn btn-primary" href="@Url.Action("SubmitClaim", "Lecturer")">Lecturer Claims</a>
-        <a class="btn btn-secondary" href="@Url.Action("Dashboard", "Manager")">Academic Manager Dashboard</a>
-        <a class="btn btn-info" href="@Url.Action("Dashboard", "Coordinator")">Programme Coordinator Dashboard</a>
+    <div class="d-grid gap-3 col-md-6 mx-auto">
+        <a class="btn btn-primary btn-lg" href="@Url.Action("SubmitClaim", "Lecturer")">
+            <i class="bi bi-person-badge me-2"></i>Lecturer Claims
+        </a>
+        <a class="btn btn-secondary btn-lg" href="@Url.Action("Dashboard", "Manager")">
+            <i class="bi bi-briefcase me-2"></i>Academic Manager Dashboard
+        </a>
+        <a class="btn btn-info btn-lg text-white" href="@Url.Action("Dashboard", "Coordinator")" style="background-color: #0dcaf0; border-color: #0dcaf0;">
+            <i class="bi bi-people me-2"></i>Programme Coordinator Dashboard
+        </a>
+        <a class="btn btn-warning btn-lg text-dark" href="@Url.Action("Dashboard", "HR")">
+            <i class="bi bi-calculator me-2"></i>HR Dashboard
+        </a>
     </div>
 </div>

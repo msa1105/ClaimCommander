@@ -4869,7 +4869,7 @@ textarea.form-control-lg {
   padding: var(--bs-alert-padding-y) var(--bs-alert-padding-x);
   margin-bottom: var(--bs-alert-margin-bottom);
   color: var(--bs-alert-color);
-  background-color: var(--bs-alert-bg);
+  background-color: #026e3d;
   border: var(--bs-alert-border);
   border-radius: var(--bs-alert-border-radius);
 }
@@ -4910,7 +4910,7 @@ textarea.form-control-lg {
 
 .alert-success {
   --bs-alert-color: var(--bs-success-text-emphasis);
-  --bs-alert-bg: var(--bs-success-bg-subtle);
+  --bs-alert-bg: #198754;
   --bs-alert-border-color: var(--bs-success-border-subtle);
   --bs-alert-link-color: var(--bs-success-text-emphasis);
 }

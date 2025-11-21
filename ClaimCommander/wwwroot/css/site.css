@@ -7,6 +7,7 @@ TABLE OF CONTENTS
     - Cards
     - Forms
     - Buttons
+    - Alerts (NEW)
 4.  Page-Specific Styles
     - Login Page
     - Dashboards (Claim Cards)
@@ -19,7 +20,7 @@ html {
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     min-height: 100%;
     display: flex;
     flex-direction: column;
@@ -30,131 +31,239 @@ main {
 }
 
 
-/* --- 2. Base Dark Theme --- */
-.dark-theme {
-    background-color: #0d1117;
-    color: #ffffff;
+/* --- 2. Base Dark Theme (Sitewide) --- */
+body, html {
+    background-color: #0d1117 !important; /* Deep Dark Background */
+    color: #f0f6fc !important; /* High Contrast White Text */
 }
 
-    .dark-theme h1, .dark-theme h2, .dark-theme h3, .dark-theme h4, .dark-theme h5,
-    .dark-theme .fw-semibold, .dark-theme .fw-bold {
-        color: #f0f6fc;
+/* Force all text to be readable */
+h1, h2, h3, h4, h5, h6, p, span, div, li, label, th, td {
+    color: #f0f6fc !important;
+}
+
+/* Vibrant Links */
+a {
+    color: #58a6ff; /* Bright Blue */
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+    a:hover {
+        color: #79c0ff; /* Lighter Blue on hover */
+        text-decoration: underline;
     }
 
-    .dark-theme .text-secondary {
+/* Borders - Subtle Blue-Grey */
+.border-top, .border-bottom, table, th, td {
+    border-color: #30363d !important;
+}
+
+
+/* --- 3. Dark Theme Components --- */
+
+/* Navbar */
+.navbar {
+    background-color: #161b22 !important;
+    border-bottom: 1px solid #30363d;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* Add depth */
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.nav-link:hover {
+    color: #58a6ff !important; /* Pop color on hover */
+}
+
+/* Cards */
+.card {
+    background-color: #161b22; /* Slightly lighter than body */
+    border: 1px solid #30363d;
+    color: #f0f6fc;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.card-header {
+    background-color: #161b22;
+    border-bottom: 1px solid #30363d;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    color: #8b949e !important; /* Muted header text for hierarchy */
+}
+
+/* Tables */
+.table {
+    color: #f0f6fc !important;
+    background-color: transparent !important;
+}
+
+    .table thead th {
+        background-color: #161b22;
+        border-bottom: 2px solid #30363d;
         color: #8b949e !important;
+        text-transform: uppercase;
+        font-size: 0.8rem;
     }
 
-    .dark-theme a {
-        color: #58a6ff;
+.table-hover > tbody > tr:hover > * {
+    background-color: #21262d; /* Highlight row on hover */
+    color: #f0f6fc;
+}
+
+/* Forms */
+.form-control, .form-select, textarea {
+    background-color: #0d1117 !important;
+    color: #f0f6fc !important;
+    border: 1px solid #30363d !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: #2f81f7 !important; /* Vibrant Focus Border */
+        box-shadow: 0 0 0 3px rgba(47, 129, 247, 0.3); /* Vibrant Glow */
     }
 
-    .dark-theme .border-top, .dark-theme .border-bottom {
-        border-color: #30363d !important;
+    /* Read-only inputs */
+    .form-control[readonly], .form-control:disabled {
+        background-color: #21262d !important;
+        color: #8b949e !important;
+        border-style: dashed;
+    }
+
+label {
+    color: #8b949e !important;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+/* --- VIBRANT BUTTONS --- */
+
+.btn-primary {
+    background-color: #2f81f7; /* Vibrant Blue */
+    border-color: #2f81f7;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+    .btn-primary:hover {
+        background-color: #58a6ff;
+        border-color: #58a6ff;
+        box-shadow: 0 0 10px rgba(88, 166, 255, 0.4); /* Glow effect */
+    }
+
+.btn-secondary {
+    background-color: #21262d;
+    border-color: #30363d;
+    color: #c9d1d9 !important;
+}
+
+    .btn-secondary:hover {
+        background-color: #30363d;
+        border-color: #8b949e;
+    }
+
+/* Outline Buttons (Vibrant Text) */
+.btn-outline-danger {
+    color: #ff7b72 !important; /* Soft Vibrant Red */
+    border-color: #ff7b72;
+}
+
+    .btn-outline-danger:hover {
+        background-color: #ff7b72;
+        color: #0d1117 !important;
+    }
+
+.btn-outline-warning {
+    color: #d29922 !important; /* Gold */
+    border-color: #d29922;
+}
+
+    .btn-outline-warning:hover {
+        background-color: #d29922;
+        color: #0d1117 !important;
+    }
+
+.btn-outline-success {
+    color: #3fb950 !important; /* Vibrant Green */
+    border-color: #3fb950;
+}
+
+    .btn-outline-success:hover {
+        background-color: #3fb950;
+        color: #0d1117 !important;
+    }
+
+/* --- ALERTS (NEW FIX) --- */
+/* Override Bootstrap alert colors to match theme */
+
+.alert-success {
+    background-color: #3fb950 !important; /* Vibrant Green Background */
+    border-color: #3fb950;
+    color: #000000 !important; /* Black Text */
+}
+
+.alert-danger {
+    background-color: #ff7b72 !important; /* Vibrant Red Background */
+    border-color: #ff7b72;
+    color: #000000 !important; /* Black Text */
+}
+
+.alert-warning {
+    background-color: #d29922 !important; /* Vibrant Gold Background */
+    border-color: #d29922;
+    color: #000000 !important; /* Black Text */
+}
+
+.alert-info {
+    background-color: #58a6ff !important; /* Vibrant Blue Background */
+    border-color: #58a6ff;
+    color: #000000 !important; /* Black Text */
+}
+
+/* Ensure close button (x) is visible on colored alerts */
+.alert .btn-close {
+    filter: none !important; /* Don't invert colors */
+    color: #000000 !important;
+    opacity: 0.5;
+}
+
+    .alert .btn-close:hover {
+        opacity: 1;
     }
 
 
-    /* --- 3. Dark Theme Components --- */
+/* Badges - High Contrast */
+.badge {
+    color: #0d1117 !important; /* Dark text on bright badges */
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
 
-    /* Navbar */
-    .dark-theme .navbar {
-        background-color: #161b22 !important;
-    }
+/* Vibrant Background Helpers */
+.bg-success {
+    background-color: #3fb950 !important;
+}
 
-    /* Cards */
-    .dark-theme .card {
-        background-color: #161b22;
-        border: 1px solid #30363d;
-    }
+.bg-warning {
+    background-color: #d29922 !important;
+}
 
-    .dark-theme .card-header {
-        background-color: #161b22;
-        border-bottom: 1px solid #30363d;
-    }
+.bg-danger {
+    background-color: #ff7b72 !important;
+}
 
-    /* Forms */
-    .dark-theme .form-control, .dark-theme .form-select {
-        background-color: #0d1117;
-        color: #c9d1d9;
-        border: 1px solid #30363d;
-    }
+.bg-primary {
+    background-color: #2f81f7 !important;
+}
 
-        .dark-theme .form-control:focus, .dark-theme .form-select:focus {
-            background-color: #0d1117;
-            color: #c9d1d9;
-            border-color: #8b949e;
-            box-shadow: none;
-        }
-
-    .dark-theme label {
-        color: #8b949e;
-    }
-
-    .dark-theme .form-floating > .form-control {
-        height: calc(3.5rem + 2px);
-    }
-
-    .dark-theme .form-floating > label {
-        padding: 1rem 0.75rem;
-    }
-
-    /* Buttons */
-    .dark-theme .btn-primary {
-        background-color: #21262d;
-        border-color: #30363d;
-        color: #f0f6fc;
-    }
-
-        .dark-theme .btn-primary:hover {
-            background-color: #30363d;
-            border-color: #8b949e;
-        }
-
-    .dark-theme .btn-outline-danger {
-        color: #f85149;
-        border-color: #f85149;
-    }
-
-        .dark-theme .btn-outline-danger:hover {
-            color: #fff;
-            background-color: #f85149;
-        }
-
-    .dark-theme .btn-outline-warning {
-        color: #b07c00; /* Changed */
-        border-color: #b07c00; /* Changed */
-    }
-
-        .dark-theme .btn-outline-warning:hover {
-            color: #fff;
-            background-color: #b07c00; /* Changed */
-        }
-
-    .dark-theme .btn-outline-success {
-        color: #3fb950;
-        border-color: #3fb950;
-    }
-
-        .dark-theme .btn-outline-success:hover {
-            color: #fff;
-            background-color: #3fb950;
-        }
-
-    /* Progress Bar for Pending Status */
-    .dark-theme .progress-bar.bg-warning {
-        background-color: #b07c00 !important;
-    }
-
-    /* Badge Styles */
-    .dark-theme .badge {
-        font-weight: 500;
-    }
-
-    .dark-theme .status-badge {
-        background-color: rgba(88, 166, 255, 0.15);
-        color: #58a6ff;
-        border: 1px solid rgba(88, 166, 255, 0.25);
-    }
+.bg-secondary {
+    background-color: #8b949e !important;
+}
 
 
 /* --- 4. Page-Specific Styles --- */
@@ -167,100 +276,105 @@ main {
     background-color: #161b22;
     border-radius: 12px;
     border: 1px solid #30363d;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6);
 }
 
     .login-container .brand-title {
-        font-family: 'Inter Tight', sans-serif;
-        font-weight: 700;
+        font-weight: 800;
         font-size: 2.5rem;
-        color: white;
+        background: -webkit-linear-gradient(45deg, #58a6ff, #a371f7); /* Gradient Text */
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin-bottom: 0.25rem;
     }
 
     .login-container .brand-subtitle {
         font-size: 1.1rem;
-        margin-bottom: 2.5rem;
-        color: white;
+        color: #8b949e !important;
+        margin-bottom: 2rem;
     }
-
-/* Dashboard - Status Item Icons */
-.status-item-card-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.dark-theme .status-item-card-icon.bg-warning {
-    background-color: rgba(176, 124, 0, 0.15); /* Changed */
-    color: #b07c00; /* Changed */
-}
-
-.dark-theme .status-item-card-icon.bg-success {
-    background-color: rgba(63, 185, 80, 0.15);
-    color: #3fb950;
-}
-
-.dark-theme .status-item-card-icon.bg-danger {
-    background-color: rgba(248, 81, 73, 0.15);
-    color: #f85149;
-}
-
-.dark-theme .status-item-card-icon.bg-primary {
-    background-color: rgba(88, 166, 255, 0.15);
-    color: #58a6ff;
-}
 
 /* Lecturer Dashboard - Claim Cards */
 .claim-card {
     border-left-width: 5px !important;
+    transition: transform 0.2s ease;
 }
 
-.claim-card-icon {
+    .claim-card:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Vibrant Borders for Cards */
+    .claim-card.border-warning {
+        border-left-color: #d29922 !important;
+    }
+
+    .claim-card.border-success {
+        border-left-color: #3fb950 !important;
+    }
+
+    .claim-card.border-danger {
+        border-left-color: #ff7b72 !important;
+    }
+
+    .claim-card.border-primary {
+        border-left-color: #2f81f7 !important;
+    }
+
+/* Status Icons with Semi-Transparent Backgrounds */
+.claim-card-icon, .status-item-card-icon {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
+    border-radius: 12px; /* Softer corners */
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    font-size: 1.5rem;
 }
 
-.claim-card.border-warning {
-    border-left-color: #b07c00 !important; /* Changed */
+    /* Specific background colors for icons to ensure icon visibility */
+    /* Warning: Gold background, Dark text */
+    .bg-warning.text-white, .claim-card-icon.bg-warning {
+        background-color: rgba(210, 153, 34, 0.2) !important;
+        color: #d29922 !important;
+    }
+
+    /* Success: Green background, Green text */
+    .bg-success.text-white, .claim-card-icon.bg-success {
+        background-color: rgba(63, 185, 80, 0.2) !important;
+        color: #3fb950 !important;
+    }
+
+    /* Danger: Red background, Red text */
+    .bg-danger.text-white, .claim-card-icon.bg-danger {
+        background-color: rgba(255, 123, 114, 0.2) !important;
+        color: #ff7b72 !important;
+    }
+
+    /* Primary: Blue background, Blue text */
+    .bg-primary.text-white, .claim-card-icon.bg-primary {
+        background-color: rgba(47, 129, 247, 0.2) !important;
+        color: #2f81f7 !important;
+    }
+
+/* Progress Bars */
+.progress {
+    background-color: #21262d;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
-.claim-card.border-success {
-    border-left-color: #3fb950 !important;
+.progress-bar {
+    color: #0d1117 !important; /* Dark text inside bright bars */
+    font-weight: bold;
 }
 
-.claim-card.border-danger {
-    border-left-color: #f85149 !important;
+/* Utilities */
+.text-muted {
+    color: #8b949e !important;
 }
 
-.claim-card.border-primary {
-    border-left-color: #58a6ff !important;
-}
-
-.dark-theme .claim-card-icon.bg-warning {
-    background-color: rgba(176, 124, 0, 0.15); /* Changed */
-    color: #b07c00; /* Changed */
-}
-
-.dark-theme .claim-card-icon.bg-success {
-    background-color: rgba(63, 185, 80, 0.15);
-    color: #3fb950;
-}
-
-.dark-theme .claim-card-icon.bg-danger {
-    background-color: rgba(248, 81, 73, 0.15);
-    color: #f85149;
-}
-
-.dark-theme .claim-card-icon.bg-primary {
-    background-color: rgba(88, 166, 255, 0.15);
-    color: #58a6ff;
+.text-secondary {
+    color: #8b949e !important;
 }

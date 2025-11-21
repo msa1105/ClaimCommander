@@ -1,0 +1,47 @@
+﻿@model ClaimCommander.Models.PaymentReportViewModel
+
+@{
+    ViewData["Title"] = "Payment Report";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Payment Report</h2>
+        <a asp-action="DownloadPaymentReport" class="btn btn-success">Download CSV</a>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light">
+            Report Date: @Model.ReportDate.ToShortDateString()
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Lecturer</th>
+                        <th>Total Claims</th>
+                        <th>Total Hours</th>
+                        <th>Total Payable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>@item.LecturerName</td>
+                            <td>@item.ClaimCount</td>
+                            <td>@item.TotalHours</td>
+                            <td>@item.TotalAmount.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="fw-bold">
+                        <td colspan="3" class="text-end">Grand Total:</td>
+                        <td>@Model.GrandTotal.ToString("C")</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

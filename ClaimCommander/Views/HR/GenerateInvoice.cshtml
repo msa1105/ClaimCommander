@@ -1,0 +1,61 @@
+﻿@model ClaimCommander.Models.InvoiceViewModel
+
+@{
+    ViewData["Title"] = "Generate Invoice";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Invoice Preview</h2>
+        <a asp-action="DownloadInvoice" asp-route-claimId="@Model.Claim.ClaimId" class="btn btn-success">
+            <i class="bi bi-download"></i> Download Invoice
+        </a>
+    </div>
+
+    <div class="card shadow-lg p-5">
+        <div class="row mb-4">
+            <div class="col-6">
+                <h1 class="text-primary">INVOICE</h1>
+            </div>
+            <div class="col-6 text-end">
+                <h4>@Model.InvoiceNumber</h4>
+                <p>Date: @Model.InvoiceDate.ToShortDateString()</p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-6">
+                <h5>Bill To:</h5>
+                <p>
+                    <strong>@Model.Claim.LecturerName</strong><br />
+                    ID: #@Model.Claim.LecturerName
+                </p>
+            </div>
+        </div>
+
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Description</th>
+                    <th>Hours</th>
+                    <th>Rate</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Teaching Services - Claim #@Model.Claim.ClaimId</td>
+                    <td>@Model.Claim.HoursWorked</td>
+                    <td>@Model.Claim.HourlyRate.ToString("C")</td>
+                    <td class="text-end">@Model.Claim.ClaimValue.ToString("C")</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" class="text-end">Total</th>
+                    <th class="text-end">@Model.Claim.ClaimValue.ToString("C")</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
