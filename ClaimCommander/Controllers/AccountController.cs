@@ -65,7 +65,7 @@ namespace ClaimCommander.Controllers
         {
             return View();
         }
-
+ 
         // Helper to determine where each role goes
         private IActionResult RedirectToRoleDashboard(string role)
         {
