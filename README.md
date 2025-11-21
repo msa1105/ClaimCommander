@@ -1,113 +1,187 @@
-# 📋 ClaimCommander - Contract Monthly Claim System
+# 🌙 **ClaimCommander**
 
+### *A Modern, Secure, Role-Driven Lecturer Claim Management System*
 
-[](https://dotnet.microsoft.com/)
-[](https://docs.microsoft.com/en-us/dotnet/csharp/)
-[](https://getbootstrap.com/)
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-.NET%208-blue" />
+  <img src="https://img.shields.io/badge/Framework-ASP.NET%20Core%20MVC-purple" />
+  <img src="https://img.shields.io/badge/UI-Bootstrap%205-teal" />
+  <img src="https://img.shields.io/badge/Security-AES%20Encryption-red" />
+</p>
 
-**A functional web-based prototype of a Contract Monthly Claim System for academic institutions.**
+ClaimCommander is a fully-featured lecturer claim management system built with **clean architecture**, **secure document handling**, and a **polished dark-mode UI**. The system supports the full lifecycle of hourly claims—submission, approval workflow, HR processing, and reporting.
 
-WATCH HERE: https://youtu.be/ehGcOK5s4Go - YOUTUBE VIDEO LINK
+---
 
+## 🚀 **Key Highlights**
 
-## 🎯 Overview
+* **Layered Architecture with DI**
+* **Session-based Authentication & RBAC**
+* **AES Encryption for Uploaded Files**
+* **Modern Dark Mode UI with Vibrant Accents**
+* **Role-Specific Dashboards & Workflows**
+* **HR Reporting + Invoicing System**
+* **CSV Export, File Uploads, Auto-Rates & Auto-Calculations**
 
-ClaimCommander is a functional prototype of a Contract Monthly Claim System (CMCS) built with ASP.NET Core MVC. This application streamlines the claim submission and approval process for academic institutions, featuring distinct dashboards and workflows for Lecturers, Coordinators, and Managers. The system uses an in-memory data service to provide a fully interactive experience.
+---
 
-**Author:** Muhammed Saif Alexander  
-**Student ID:** ST10275164  
-**Module:** PROG6212 - Programming 2B
+# 🏗️ **System Architecture**
 
-## ✨ Key Features
+### **Layered, Scalable, and Clean**
 
-  - **Homepage Navigation**: A central landing page to direct users to the correct role-based view.
-  - **Lecturer Dashboard**:
-      - Simplified, **subject-based claim submission** with predefined hourly rates.
-      - Intuitive **progress bar** to track claim approval status.
-      - Dashboard summary of total hours, total amount, and pending claims.
-  - **Manager & Coordinator Dashboards**: Review, approve, or reject claims within a multi-step approval workflow.
-  - **Document Management**: Ability to attach supporting documents to claims.
-  - **Role-Based Access**: Separate, tailored interfaces for Lecturers, Coordinators, and Managers.
-  - **Responsive Design**: A modern, readable dark-themed UI that works on desktop and mobile.
+✔ Controllers → Services → Models
+✔ Dependency Injection across all core components
+✔ No database required (In-Memory storage for demo mode)
 
-## 🏗️ Architecture
+**In-Memory Storage Services:**
 
-Built using **ASP.NET Core MVC** with a clear separation of concerns:
+* `InMemoryClaimStorageService`
+* `InMemoryLecturerService`
+* `InMemoryUserService`
 
-  - **Models**: Defines the data entities (User, Claim, DocumentInfo) and ViewModels.
-  - **Views**: Razor pages (`.cshtml`) for the user interface.
-  - **Controllers**: Handle user input, business logic, and data flow.
-  - **In-Memory Service**: A service (`InMemoryClaimStorageService`) acts as a temporary data store, simulating backend functionality with mock data.
+---
 
-## 📊 Database Design
+# 🔐 **Authentication & Security**
 
-The application is designed around core entities with the following relationships:
+### **Role-Based Access Control (RBAC)**
 
-  - **Users** → **Claims** (1-to-many)
-  - **Claims** → **Documents** (1-to-many)
+Four distinct system roles:
 
-## 🚀 Quick Start
+| Role                      | Responsibilities                                   |
+| ------------------------- | -------------------------------------------------- |
+| **Lecturer**              | Submit claims, upload files, track statuses        |
+| **Programme Coordinator** | Review and approve/reject claims                   |
+| **Academic Manager**      | High-level approval and audit trail                |
+| **HR / Finance**          | Manage lecturer details, rates, payments & reports |
 
-### Prerequisites
+### **Security Features**
 
-  - .NET 7.0 SDK
-  - Visual Studio 2022
+* **AES Encryption** on all uploaded documents
+* **Session-based authentication**
+* **Authorization checks** on every controller action
+* **Server-side validation** for form inputs
+* **CSRF protection** with anti-forgery tokens
+* **Friendly error handling** for all states
 
-### Installation
+---
 
-```bash
-# Clone the repository
-git clone https://github.com/msa1105/ClaimCommander.git
+# 🎨 **User Interface**
 
-# Navigate to the project directory
-cd ClaimCommander/ClaimCommander
+### **Dark Theme + Vibrant Accents**
 
-# Restore dependencies
-dotnet restore
+A custom, high-contrast dark UI enhanced with:
 
-# Run the application
-dotnet run
-```
+* Electric Blue
+* Neon Green
+* Gold
+* Coral Red
 
-Access the application at `https://localhost:xxxx` (port number may vary).
+### **Visual Enhancements**
 
-## 📁 Project Structure
+* Color-coded claim statuses
+* Responsive across all screen sizes (Bootstrap 5)
+* Modern cards, badges, tables, and dashboards
+
+---
+
+# 👨‍🏫 **Lecturer Features**
+
+### ✓ *Simple, Automated Claim Submission*
+
+* Official hourly rates are **locked & system-controlled**
+* Total claim value auto-calculated (`Hours × Rate`)
+* Upload formats: **PDF, DOCX, XLSX**
+* File size: **≤ 5MB**, validated server-side
+* Full claim history with real-time statuses
+
+---
+
+# 🧑‍🏫 **Coordinator & Manager Features**
+
+* Review all pending claims
+* Approve or reject with notes
+* View attached documents
+* Transparent workflow showing all claim details
+
+---
+
+# 🧾 **HR & Finance Features**
+
+### **Lecturer Management**
+
+* View all lecturers
+* Edit contact details
+* Set/update official hourly rates
+
+### **Reporting & Invoicing**
+
+* Generate filtered payment reports
+* Export data as **CSV**
+* Produce HTML invoices for any claim
+* Mark claims as **Paid** (final workflow state)
+
+---
+
+# 📊 **Dashboards & Workflow**
+
+Each role sees a custom dashboard with:
+
+* Pending actions
+* Financial summaries
+* Quick links
+* Status indicators and logs
+
+---
+
+# 🛡️ **Validation & Error Handling**
+
+* Required-field checks
+* Numeric range validation
+* File validation rules
+* Consistent success (green) / error (red) alerts
+* Graceful fallback pages for edge cases
+
+---
+
+# 📦 **Project Structure**
 
 ```
 ClaimCommander/
-├── Controllers/      # Handles requests for Lecturer, Manager, Coordinator
-├── Models/           # Contains data models and ViewModels
-├── Views/            # Razor views for each role and action
-├── wwwroot/          # Static assets (CSS, JavaScript, libraries)
-└── Services/         # Contains the in-memory data storage service
+│
+├── Controllers/
+├── Services/
+├── Models/
+├── Views/
+│   ├── Lecturer/
+│   ├── Coordinator/
+│   ├── Manager/
+│   └── HR/
+│
+├── wwwroot/
+│   ├── css/
+│   └── uploads/
+│
+└── Program.cs (DI + Routing + Auth)
 ```
 
-## 🎨 UI Design
+---
 
-  - **Clean, modern interface** with a high-contrast dark theme for readability.
-  - **Card-based layout** for displaying claims and summaries.
-  - **Intuitive progress bars** for at-a-glance status tracking.
-  - **Role-specific dashboards** tailored to the needs of each user type.
-  - **Responsive design** ensures a seamless experience on both desktop and mobile devices.
+# 🗺️ **Roadmap**
 
-## 🔧 Development Status
+* ✔ Add database migration option (SQL/SQLite)
+* ✔ Add JWT authentication mode
+* ⬜ Add email notifications
+* ⬜ Add bulk approval and payment runs
+* ⬜ Add Power BI export
 
-**Phase:** Part 1 - Functional Prototype  
-**Status:** The application is a fully interactive prototype using an in-memory data service. All core UI and workflow features are implemented.  
-**Next Phase:** Integration with a persistent database (e.g., SQL Server) and implementation of user authentication.
+---
 
-## 📋 Current Limitations
+# 🤝 **Contributing**
 
-  - **No Data Persistence**: The application uses an in-memory service. All data, including new claims, will be reset when the application is restarted.
-  - **No Authentication**: The application does not currently have a user login or authentication system.
-  - **Mock Data**: The initial set of claims is hard-coded for demonstration purposes.
+Pull requests are welcome—especially UI refinements, performance improvements, and feature extensions.
 
-## 👨‍💻 Author
+---
 
-**Muhammed Saif Alexander** Student ID: ST10275164  
-Module: PROG6212 - Programming 2B  
-GitHub: [@msa1105](https://github.com/msa1105)
+# 📜 **License**
 
------
-
-*This is Part 1 of the Portfolio of Evidence for PROG6212*
+MIT License.
